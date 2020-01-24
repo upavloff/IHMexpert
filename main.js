@@ -64,14 +64,14 @@ class Triangle {
         this.selectable = selectable;
         this.selected = false;
         //coordinates
-        this.t1 = { x: this.x - this.h / 2, y: this.y + this.h / 2 }; //left coin
-        this.t2 = { x: this.x, y: this.y - this.h / 2 }; //top coin
-        this.t3 = { x: this.x + this.h / 2, y: this.y + this.h / 2 }; //right coin
+        this.t1 = { x: this.x - this.h / 2, y: this.y + this.h / 2 }; //left coin /_
+        this.t2 = { x: this.x, y: this.y - this.h / 2 }; //top coin /\
+        this.t3 = { x: this.x + this.h / 2, y: this.y + this.h / 2 }; //right coin _\
         //parameters of the segments - a*X+b
-        this.a_t1_t2 = (this.t1.y - this.t2.y) / (this.t1.y - this.t2.y);
-        this.b_t1_t2 = (this.a_t1_t2 * this.t1.x - this.t1.y);
-        this.a_t2_t3 = (this.t2.y - this.t3.y) / (this.t2.y - this.t3.y);
-        this.b_t2_t3 = (this.a_t2_t3 * this.t2.x - this.t3.y);
+        this.a_t1_t2 = (this.t1.y - this.t2.y) / (this.t1.x - this.t2.x);
+        this.b_t1_t2 = (this.t2.y - this.a_t1_t2 * this.t2.x);
+        this.a_t2_t3 = (this.t2.y - this.t3.y) / (this.t2.x - this.t3.x);
+        this.b_t2_t3 = (this.t3.y - this.a_t2_t3 * this.t3.x);
 
     }
     slope_t1_t2(x) {
@@ -95,8 +95,8 @@ class Triangle {
 
     contains(x, y) {
         return x >= this.t1.x && x < this.t3.x &&
-            y >= this.slope_t1_t2(x) && y >= this.slope_t2_t3(y) &&
-            y >= this.t2.y && y <= this.t3.y;
+            y > this.slope_t1_t2(x) && y > this.slope_t2_t3(x) &&
+            y <= this.t3.y;
     }
 }
 
