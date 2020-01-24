@@ -29,6 +29,39 @@ class Square {
     }
 }
 
+class Cross {
+    constructor(x, y, w, h, thickness, selectable) {
+        this.w = w;
+        this.h = h;
+        this.thickness = thickness
+        this.rect1x = x - thickness / 2;
+        this.rect1y = y - h / 2;
+        this.rect2x = x - w / 2;
+        this.rect2y = y - thickness / 2;
+        this.highlight = false;
+        this.selectable = selectable;
+        this.selected = false;
+    }
+
+    draw() {
+        if (this.highlight) {
+            ctx.fillStyle = COLOr_CROSS_LIT;
+        } else {
+            ctx.fillStyle = COLOR_CROSS;
+        }
+        ctx.fillRect(this.rect1x, this.rect1y, this.thickness, this.h);
+        ctx.fillRect(this.rect2x, this.rect2y, this.w, this.thickness);
+    }
+
+    contains(x, y) {
+        //method wich return true if (x,y) inside of the cross
+        return x > this.rect1x && x < this.rect1x + this.thickness &&
+            y > this.rect1y && y < this.rect1y + this.h ||
+            x > this.rect2x && x < this.rect2x + this.w &&
+            y > this.rect2y && y < this.rect2y + this.thickness;
+    }
+}
+
 class Circle {
     constructor(x, y, selectable) {
         this.x = x;
@@ -113,6 +146,7 @@ const STROKE = CELL / 12; //stroke width
 const CIRCLE_RADIUS = CELL / 4;
 const SQUARE_SIZE = CELL / 2;
 const TRIANGLE_HEIGHT = CELL / 2;
+const CROSS_THICKNESS = CELL / 8
 const MARGIN = HEIGHT - (GRID_SIZE + 1) * CELL; //top margin for scores
 
 //colours
@@ -120,6 +154,8 @@ const COLOR_BOARD = "gainsboro";
 const COLOR_BOARDER = "grey";
 const COLOR_SQUARE = "crimson";
 const COLOR_SQUARE_LIT = "lightpink";
+const COLOR_CROSS = "limegreen";
+const COLOr_CROSS_LIT = "lightgreen";
 const COLOR_CIRCLE = "royalblue";
 const COLOR_CIRCLE_LIT = "lightsteelblue";
 const COLOR_TRIANGLE = "darkorange";
@@ -187,10 +223,12 @@ function newGame() { //add number of each form or the proportion in the futur
         forms[i] = [];
         for (j = 0; j < GRID_SIZE; j++) {
             alea = Math.random();
-            if (alea < 1 / 3) {
+            if (alea < 1 / 4) {
                 forms[i][j] = new Square(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, false);
-            } else if (alea < 2 / 3) {
+            } else if (alea < 2 / 4) {
                 forms[i][j] = new Circle(getGridX(j), getGridY(i), false);
+            } else if (alea < 3 / 4) {
+                forms[i][j] = new Cross(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, CROSS_THICKNESS, false);
             } else {
                 forms[i][j] = new Triangle(getGridX(j), getGridY(i), false);
             }
