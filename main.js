@@ -15,7 +15,12 @@ class Square {
     }
 
     draw() {
-        if (this.highlight) {
+        if (this.selected) {
+            ctx.fillStyle = COLOR_SQUARE;
+            ctx.fillRect(this.left - SELECT_MARGIN / 2, this.top - SELECT_MARGIN / 2, this.w + SELECT_MARGIN, this.h + SELECT_MARGIN);
+            ctx.fillStyle = COLOR_SELECT;
+
+        } else if (this.highlight) {
             ctx.fillStyle = COLOR_SQUARE_LIT;
         } else {
             ctx.fillStyle = COLOR_SQUARE;
@@ -44,8 +49,14 @@ class Cross {
     }
 
     draw() {
-        if (this.highlight) {
-            ctx.fillStyle = COLOr_CROSS_LIT;
+        if (this.selected) { // not done -------------------------------
+            ctx.fillStyle = COLOR_CROSS
+            ctx.fillRect(this.rect1x - SELECT_MARGIN / 2, this.rect1y - SELECT_MARGIN / 2, this.thickness + SELECT_MARGIN, this.h + SELECT_MARGIN);
+            ctx.fillRect(this.rect2x - SELECT_MARGIN / 2, this.rect2y - SELECT_MARGIN / 2, this.w + SELECT_MARGIN, this.thickness + SELECT_MARGIN);
+            ctx.fillStyle = COLOR_SELECT;
+
+        } else if (this.highlight) {
+            ctx.fillStyle = COLOR_CROSS_LIT;
         } else {
             ctx.fillStyle = COLOR_CROSS;
         }
@@ -73,7 +84,13 @@ class Circle {
     }
 
     draw() {
-        if (this.highlight) {
+        if (this.selected) {
+            ctx.fillStyle = COLOR_CIRCLE;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius + SELECT_MARGIN / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = COLOR_SELECT;
+        } else if (this.highlight) {
             ctx.fillStyle = COLOR_CIRCLE_LIT;
         } else {
             ctx.fillStyle = COLOR_CIRCLE;
@@ -114,7 +131,16 @@ class Triangle {
         return this.a_t2_t3 * x + this.b_t2_t3;
     }
     draw() {
-        if (this.highlight) {
+        if (this.selected) {
+            ctx.fillStyle = COLOR_TRIANGLE;
+            ctx.beginPath();
+            ctx.moveTo(this.t1.x - SELECT_MARGIN, this.t1.y + SELECT_MARGIN / 2);
+            ctx.lineTo(this.t2.x, this.t2.y - SELECT_MARGIN);
+            ctx.lineTo(this.t3.x + SELECT_MARGIN, this.t3.y + SELECT_MARGIN / 2);
+            ctx.fill();
+            ctx.fillStyle = COLOR_SELECT;
+
+        } else if (this.highlight) {
             ctx.fillStyle = COLOR_TRIANGLE_LIT;
         } else {
             ctx.fillStyle = COLOR_TRIANGLE;
@@ -148,6 +174,7 @@ const SQUARE_SIZE = CELL / 2;
 const TRIANGLE_HEIGHT = CELL / 2;
 const CROSS_THICKNESS = CELL / 8
 const MARGIN = HEIGHT - (GRID_SIZE + 1) * CELL; //top margin for scores
+const SELECT_MARGIN = CELL / 8;
 
 //colours
 const COLOR_BOARD = "gainsboro";
@@ -155,11 +182,12 @@ const COLOR_BOARDER = "grey";
 const COLOR_SQUARE = "crimson";
 const COLOR_SQUARE_LIT = "lightpink";
 const COLOR_CROSS = "limegreen";
-const COLOr_CROSS_LIT = "lightgreen";
+const COLOR_CROSS_LIT = "lightgreen";
 const COLOR_CIRCLE = "royalblue";
 const COLOR_CIRCLE_LIT = "lightsteelblue";
 const COLOR_TRIANGLE = "darkorange";
 const COLOR_TRIANGLE_LIT = "lightsalmon";
+const COLOR_SELECT = "white";
 
 //set up game canvas 
 var canv = document.createElement("canvas");
@@ -181,7 +209,8 @@ ctx.lineWidth = STROKE;
 var forms = newGame();
 
 //event handlers
-canv.addEventListener("mousemove", highlightsForms); //add highlights even with just mousemouve
+canv.addEventListener("mousemove", highlightsForm); //add highlights just with mousemouve
+canv.addEventListener("mousedown", selectForm); //add highlights with mouse click
 
 
 //set up the game loop
@@ -224,20 +253,20 @@ function newGame() { //add number of each form or the proportion in the futur
         for (j = 0; j < GRID_SIZE; j++) {
             alea = Math.random();
             if (alea < 1 / 4) {
-                forms[i][j] = new Square(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, false);
+                forms[i][j] = new Square(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, true);
             } else if (alea < 2 / 4) {
-                forms[i][j] = new Circle(getGridX(j), getGridY(i), false);
+                forms[i][j] = new Circle(getGridX(j), getGridY(i), true);
             } else if (alea < 3 / 4) {
-                forms[i][j] = new Cross(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, CROSS_THICKNESS, false);
+                forms[i][j] = new Cross(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, CROSS_THICKNESS, true);
             } else {
-                forms[i][j] = new Triangle(getGridX(j), getGridY(i), false);
+                forms[i][j] = new Triangle(getGridX(j), getGridY(i), true);
             }
         }
     }
     return forms;
 }
 
-function highlightsForms( /* type MouseEvent*/ event) {
+function highlightsForm( /* type MouseEvent*/ event) {
     //get mouse position relative to the canvas
     let x = event.clientX - canvBoundings.left;
     let y = event.clientY - canvBoundings.top;
@@ -257,5 +286,20 @@ function highlightsForms( /* type MouseEvent*/ event) {
             }
         }
     }
+}
 
+function selectForm( /* type MouseEvent*/ event) {
+    //get mouse position relative to the canvas
+    let x = event.clientX - canvBoundings.left;
+    let y = event.clientY - canvBoundings.top;
+
+    //look for forms to highlight
+    OUTER: for (let row of forms) {
+        for (let form of row) {
+            if (form.contains(x, y) && form.selectable == true) {
+                form.selected = true; //create this attribute !
+                break OUTER; //if one form is to highlight no need to look further
+            }
+        }
+    }
 }
