@@ -2,7 +2,7 @@
 //probablement à transferer dans un autre fichier js quand on saura comment faire
 
 class Square {
-    constructor(x, y, w, h) {
+    constructor(x, y, w, h, selectable) {
         this.w = w;
         this.h = h;
         this.bottom = y + h / 2;
@@ -10,6 +10,8 @@ class Square {
         this.right = x + w / 2;
         this.left = x - w / 2;
         this.highlight = false;
+        this.selectable = selectable;
+        this.selected = false;
     }
 
     draw() {
@@ -28,11 +30,13 @@ class Square {
 }
 
 class Circle {
-    constructor(x, y) {
+    constructor(x, y, selectable) {
         this.x = x;
         this.y = y;
         this.radius = CIRCLE_RADIUS;
         this.highlight = false;
+        this.selectable = selectable;
+        this.selected = false;
     }
 
     draw() {
@@ -52,13 +56,30 @@ class Circle {
 }
 
 class Triangle {
-    constructor(x, y) {
+    constructor(x, y, selectable) {
         this.x = x;
         this.y = y;
         this.h = TRIANGLE_HEIGHT;
         this.highlight = false;
-    }
+        this.selectable = selectable;
+        this.selected = false;
+        //coordinates
+        this.t1 = { x: this.x - this.h / 2, y: this.y + this.h / 2 }; //left coin
+        this.t2 = { x: this.x, y: this.y - this.h / 2 }; //top coin
+        this.t3 = { x: this.x + this.h / 2, y: this.y + this.h / 2 }; //right coin
+        //parameters of the segments - a*X+b
+        this.a_t1_t2 = (this.t1.y - this.t2.y) / (this.t1.y - this.t2.y);
+        this.b_t1_t2 = (this.a_t1_t2 * this.t1.x - this.t1.y);
+        this.a_t2_t3 = (this.t2.y - this.t3.y) / (this.t2.y - this.t3.y);
+        this.b_t2_t3 = (this.a_t2_t3 * this.t2.x - this.t3.y);
 
+    }
+    slope_t1_t2(x) {
+        return this.a_t1_t2 * x + this.b_t1_t2;
+    }
+    slope_t2_t3(x) {
+        return this.a_t2_t3 * x + this.b_t2_t3;
+    }
     draw() {
         if (this.highlight) {
             ctx.fillStyle = COLOR_TRIANGLE_LIT;
@@ -66,15 +87,16 @@ class Triangle {
             ctx.fillStyle = COLOR_TRIANGLE;
         }
         ctx.beginPath();
-        ctx.moveTo(this.x - this.h / 2, this.y + this.h / 2);
-        ctx.lineTo(this.x, this.y - this.h / 2)
-        ctx.lineTo(this.x + this.h / 2, this.y + this.h / 2)
+        ctx.moveTo(this.t1.x, this.t1.y);
+        ctx.lineTo(this.t2.x, this.t2.y);
+        ctx.lineTo(this.t3.x, this.t3.y);
         ctx.fill();
     }
 
     contains(x, y) {
-        //change it
-        return false;
+        return x >= this.t1.x && x < this.t3.x &&
+            y >= this.slope_t1_t2(x) && y >= this.slope_t2_t3(y) &&
+            y >= this.t2.y && y <= this.t3.y;
     }
 }
 
@@ -145,7 +167,7 @@ function drawBoard() {
 function drawForms(forms) {
     for (let row of forms) {
         for (let form of row) {
-            form.draw()
+            form.draw();
         }
     }
 }
@@ -166,11 +188,11 @@ function newGame() { //add number of each form or the proportion in the futur
         for (j = 0; j < GRID_SIZE; j++) {
             alea = Math.random();
             if (alea < 1 / 3) {
-                forms[i][j] = new Square(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE);
+                forms[i][j] = new Square(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, false);
             } else if (alea < 2 / 3) {
-                forms[i][j] = new Circle(getGridX(j), getGridY(i));
+                forms[i][j] = new Circle(getGridX(j), getGridY(i), false);
             } else {
-                forms[i][j] = new Triangle(getGridX(j), getGridY(i));
+                forms[i][j] = new Triangle(getGridX(j), getGridY(i), false);
             }
         }
     }
