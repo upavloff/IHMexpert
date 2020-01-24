@@ -189,10 +189,11 @@ function highlightsForms( /* type MouseEvent*/ event) {
         }
     }
     //look for forms to highlight
-    for (let row of forms) {
+    OUTER: for (let row of forms) {
         for (let form of row) {
             if (form.contains(x, y)) {
                 form.highlight = true; //create this attribute
+                break OUTER; //if one form is to highlight no need to look further
             }
         }
     }
