@@ -1,5 +1,7 @@
 # IHMexpert
 
+try it : https://ulrych8.github.io/IHMexpert/index.html
+------
 Notre projet vise à répondre à la question "Pourquoi ne devenons nous pas des experts ?". 
 
 Cette question est légitime dans une multitude de contexte. Pour une multitude de tâches qui sont quotidiennes pour beaucoup de personnes (traitement de texte, montage photo/vidéo), il existe des outils qui sont faits pour les experts (Latex, Photoshop).
