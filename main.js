@@ -253,7 +253,7 @@ function getTimelineGridX(col) {
 
 function getTimelineGridY() {
     //only one line so no need for argument
-    return MIN_SIZE + MIN_SIZE;
+    return TL_MARGIN + MIN_SIZE / 2 + 18; //18 is the size of the font
 }
 
 function drawStep() {
