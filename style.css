@@ -1,1 +1,10 @@
+#timelineCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 
+#formsBoardCanvas {
+    position: absolute;
+    left: 0;
+}
