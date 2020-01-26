@@ -230,7 +230,7 @@ class Button {
 //-----------------------------------------------------------------------------------
 //                            GAME PARAMETERS
 //-----------------------------------------------------------------------------------
-
+//careful if changed this list has to be in the same order as the forms in the learning board
 var formsList = ["Square", "Circle", "Triangle", "Cross"];
 
 //--------------------------------------------------------------------------------
@@ -263,6 +263,8 @@ var ctxTimeline = canvTimeline.getContext("2d");
 var indexStep = new Indexer(getTimelineGridX(0), getTimelineGridY(), INDEX_SIZE, INDEX_SIZE);
 
 var formTimeline = [];
+var nameCurrentForm = "";
+
 for (let i = 0; i < STEP; i++) {
     currentForm = null;
     switch (formsList[Math.floor(Math.random() * formsList.length)]) {
@@ -284,6 +286,7 @@ for (let i = 0; i < STEP; i++) {
     }
 
     formTimeline[i] = currentForm;
+    nameCurrentForm = currentForm.constructor.name;
 }
 
 //-------------------------------- functions ---------------------------------
@@ -438,8 +441,7 @@ function highlightForm( /* type MouseEvent*/ event) {
     //get mouse position relative to the canvas
     let x = event.clientX - canvBoundings.left;
     let y = event.clientY - canvBoundings.top;
-    console.log("y : " + y)
-        //reset cursor
+    //reset cursor
     document.body.style.cursor = "auto";
     //clear previous highlight
     for (let row of formsBoard) {
@@ -481,13 +483,15 @@ function gameUpdate() {
     formTimeline[currentStep].highlight = true;
     currentStep++;
     currentScore += 10;
+    unlockable = true;
     if (currentStep >= STEP) {
         console.log("END OF THE GAME");
         return;
     }
+    nameCurrentForm = formTimeline[currentStep].constructor.name;
     indexStep.x = getTimelineGridX(currentStep);
-    currentTarget = createTarget(formTimeline[currentStep].constructor.name)
-    boardInfos = newGame(formTimeline[currentStep].constructor.name);
+    currentTarget = createTarget(nameCurrentForm)
+    boardInfos = newGame(nameCurrentForm);
     formsBoard = boardInfos.formsBoard;
     nbFormToSelect = boardInfos.nbFormToSelect;
     nbCurrentFormSelected = 0;
@@ -555,6 +559,7 @@ targetCanvas.height = TC_HEIGHT;
 targetCanvas.width = TC_WIDTH;
 targetCanvas.style.top = String(TL_HEIGHT + SC_HEIGHT + TC_TOP_MARGIN) + "px";
 targetCanvas.style.left = String(WIDTH + STROKE) + "px";
+var targetCanvasBoundings = targetCanvas.getBoundingClientRect();
 
 //chrono variables
 var start = new Date(); //begin the timer
@@ -568,10 +573,44 @@ ctxTarget.lineWidth = STROKE;
 
 var currentTarget = createTarget(formTimeline[0].constructor.name);
 
+//to authorize only one unlock at the time
+var unlockable = true;
 //unlock button
 var unlockButton = new Button(UNLOCK_X, UNLOCK_Y, UNLOCK_W, UNLOCK_H, UNLOCK_RADIUS, ctxTarget);
 
+targetCanvas.addEventListener("mousemove", highlightButton); //add highlights just with mousemouve
+targetCanvas.addEventListener("mousedown", unlocker); //add highlights with mouse click
+
 //--------------------------------  function ---------------------------------
+function highlightButton( /* type MouseEvent*/ event) {
+    //get mouse position relative to the canvas
+    let x = event.clientX - targetCanvasBoundings.left;
+    let y = event.clientY - targetCanvasBoundings.top;
+    //reset cursor
+    document.body.style.cursor = "auto";
+    //clear previous highlight
+    unlockButton.highlight = false; //create this attribute
+
+    //look for forms to highlight
+    if (unlockButton.contains(x, y)) {
+        unlockButton.highlight = true; //create this attribute !
+        document.body.style.cursor = "pointer";
+    }
+}
+
+function unlocker( /* type MouseEvent*/ event) {
+    //get mouse position relative to the canvas
+    let x = event.clientX - targetCanvasBoundings.left;
+    let y = event.clientY - targetCanvasBoundings.top;
+    if (unlockButton.contains(x, y) && nbCurrentFormSelected >= nbFormToSelect) {
+        //next if is to test if learning state can improve
+        if (learningState[nameCurrentForm] <= NB_LOCKS && unlockable) {
+            learningState[nameCurrentForm] += 1;
+            unlockable = false;
+        }
+    }
+}
+
 function drawTarget() {
     //draw Target Board
     ctxTarget.fillStyle = COLOR_BOARD;
@@ -637,9 +676,13 @@ function chronometer() {
 //                             learningCanvas
 //------------------------------------------------------------------------------
 const LC_CELL = 70;
+const NB_LOCKS = 3;
+const IMG_WIDTH = 4 * LC_CELL / 12;
+const IMG_HEIGHT = 5 * LC_CELL / 12;
+const IMG_MARGIN = LC_CELL / 2;
 const LC_MARGIN = LC_CELL; //tester differentes valeurs
 const LC_HEIGHT = LC_CELL * (formsList.length + 1); //LearningCanvas Height
-const LC_WIDTH = 3 * LC_CELL; //LearningCanvas Width
+const LC_WIDTH = 3 / 2 * LC_CELL + (NB_LOCKS + 2) * IMG_WIDTH; //LearningCanvas Width
 const LC_CIRCLE_RADIUS = LC_CELL / 4;
 const LC_SQUARE_SIZE = LC_CELL / 2;
 const LC_TRIANGLE_HEIGHT = LC_CELL / 2;
@@ -650,6 +693,13 @@ learningCanvas.height = LC_HEIGHT;
 learningCanvas.width = LC_WIDTH;
 learningCanvas.style.top = String(TL_HEIGHT) + "px";
 learningCanvas.style.left = String(WIDTH + STROKE + SC_WIDTH + STROKE) + "px";
+
+var learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
+//load img
+var imgLock = new Image();
+imgLock.src = 'lock.png';
+var imgUnlock = new Image();
+imgUnlock.src = 'unlock.png';
 
 //set up context
 var ctxLearning = learningCanvas.getContext("2d");
@@ -665,11 +715,19 @@ const learningForms = [
 //-----------------------------   function   -----------------------------------
 
 function getLearningGridX() {
-    return LC_CELL;
+    return 3 / 4 * LC_CELL;
 }
 
 function getLearningGridY(row) {
     return LC_MARGIN + CELL * row;
+}
+
+function getImgGridX(j) {
+    return 3 / 2 * LC_CELL + j * IMG_MARGIN - IMG_WIDTH / 2;
+}
+
+function getImgGridY(row) {
+    return LC_MARGIN + CELL * row - IMG_HEIGHT / 2;
 }
 
 function drawLearning() {
@@ -681,6 +739,19 @@ function drawLearning() {
     //draw forms
     for (let form of learningForms) {
         form.draw();
+    }
+    drawLocks();
+}
+
+function drawLocks() {
+    for (let i = 0; i < formsList.length; i++) {
+        for (let j = 0; j < NB_LOCKS; j++) {
+            if (learningState[formsList[i]] > j) {
+                ctxLearning.drawImage(imgUnlock, getImgGridX(j), getImgGridY(i), IMG_WIDTH, IMG_HEIGHT);
+            } else {
+                ctxLearning.drawImage(imgLock, getImgGridX(j), getImgGridY(i), IMG_WIDTH, IMG_HEIGHT);
+            }
+        }
     }
 }
 
