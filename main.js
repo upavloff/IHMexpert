@@ -181,6 +181,48 @@ class Indexer {
     }
 }
 
+class Button {
+    constructor(x, y, w, h, radius, context) {
+        this.w = w;
+        this.h = h;
+        this.bottom = y + h / 2;
+        this.top = y - h / 2;
+        this.right = x + w / 2;
+        this.left = x - w / 2;
+        this.radius = radius;
+        this.highlight = false;
+        //this.selectable = selectable;
+        //this.selected = false;
+        this.ctx = context; //necessary because of different canvas
+    }
+
+    draw() {
+        if (this.highlight) {
+            this.ctx.fillStyle = UNLOCK_BUTTON_COLOR_LIT;
+        } else {
+            this.ctx.fillStyle = UNLOCK_BUTTON_COLOR;
+        }
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = UNLOCK_BUTTON_COLOR_STROKE;
+        this.ctx.lineWidth = "4";
+        this.ctx.moveTo(this.left + this.radius, this.top);
+        this.ctx.lineTo(this.right - this.radius, this.top);
+        this.ctx.quadraticCurveTo(this.right, this.top, this.right, this.top + this.radius);
+        this.ctx.lineTo(this.right, this.bottom - this.radius);
+        this.ctx.quadraticCurveTo(this.right, this.bottom, this.right - this.radius, this.bottom);
+        this.ctx.lineTo(this.left + this.radius, this.bottom);
+        this.ctx.quadraticCurveTo(this.left, this.bottom, this.left, this.bottom - this.radius);
+        this.ctx.lineTo(this.left, this.top + this.radius);
+        this.ctx.quadraticCurveTo(this.left, this.top, this.left + this.radius, this.top);
+        this.ctx.fill();
+        this.ctx.stroke();
+    }
+
+    contains(x, y) {
+        //method wich return true if (x,y) inside of the square
+        return x > this.left && x < this.right && y > this.top && y < this.bottom;
+    }
+}
 //-----------------------------end class-------------------------------------
 //###################################################################################
 
@@ -392,10 +434,12 @@ function newGame(selectableForm) { //add number of each form or the proportion i
 }
 
 function highlightForm( /* type MouseEvent*/ event) {
+    //highlights forms inside the forms board canvas
     //get mouse position relative to the canvas
     let x = event.clientX - canvBoundings.left;
     let y = event.clientY - canvBoundings.top;
-    //reset cursor
+    console.log("y : " + y)
+        //reset cursor
     document.body.style.cursor = "auto";
     //clear previous highlight
     for (let row of formsBoard) {
@@ -403,6 +447,7 @@ function highlightForm( /* type MouseEvent*/ event) {
             form.highlight = false; //create this attribute
         }
     }
+
     //look for forms to highlight
     OUTER: for (let row of formsBoard) {
         for (let form of row) {
@@ -478,7 +523,8 @@ function drawScore() {
     //draw the text
     ctxScore.fillStyle = SCORE_COLOR_FONT;
     ctxScore.font = "bold 18px arial";
-    ctxScore.fillText("SCORE : " + currentScore, 20, SC_HEIGHT / 2 + 9); //magic numbers ...
+    ctxScore.textAlign = "center";
+    ctxScore.fillText("SCORE : " + currentScore, SC_WIDTH / 2, SC_HEIGHT / 2 + 7); //magic numbers ...
 
 }
 
@@ -495,6 +541,14 @@ const TC_SQUARE_SIZE = TC_CELL / 2;
 const TC_TRIANGLE_HEIGHT = TC_CELL / 2;
 const TC_CROSS_THICKNESS = TC_CELL / 8;
 const TARGET_COLOR_FONT = "red";
+const UNLOCK_X = TC_WIDTH / 2;
+const UNLOCK_Y = TC_HEIGHT - 30;
+const UNLOCK_W = 2 / 3 * TC_WIDTH;
+const UNLOCK_H = 33;
+const UNLOCK_RADIUS = 10;
+const UNLOCK_BUTTON_COLOR = "white";
+const UNLOCK_BUTTON_COLOR_LIT = "gray";
+const UNLOCK_BUTTON_COLOR_STROKE = "darkgrey";
 
 var targetCanvas = document.getElementById("targetCanvas");
 targetCanvas.height = TC_HEIGHT;
@@ -502,12 +556,20 @@ targetCanvas.width = TC_WIDTH;
 targetCanvas.style.top = String(TL_HEIGHT + SC_HEIGHT + TC_TOP_MARGIN) + "px";
 targetCanvas.style.left = String(WIDTH + STROKE) + "px";
 
+//chrono variables
+var start = new Date(); //begin the timer
+var end = 0;
+var diff = 0;
+var timer = "00:00";
+
 //set up context
 var ctxTarget = targetCanvas.getContext("2d");
 ctxTarget.lineWidth = STROKE;
 
 var currentTarget = createTarget(formTimeline[0].constructor.name);
 
+//unlock button
+var unlockButton = new Button(UNLOCK_X, UNLOCK_Y, UNLOCK_W, UNLOCK_H, UNLOCK_RADIUS, ctxTarget);
 
 //--------------------------------  function ---------------------------------
 function drawTarget() {
@@ -517,7 +579,20 @@ function drawTarget() {
     ctxTarget.fillRect(0, 0, TC_WIDTH, TC_HEIGHT);
     ctxTarget.strokeRect(STROKE / 2, STROKE / 2, TC_WIDTH - STROKE, TC_HEIGHT - STROKE);
     //draw the target
-    currentTarget.draw()
+    currentTarget.draw();
+    //draw chronometer
+    chronometer();
+    ctxTarget.fillStyle = TARGET_COLOR_FONT;
+    ctxTarget.font = "bold 24px arial";
+    ctxTarget.textAlign = "center";
+    ctxTarget.fillText(timer, TC_WIDTH / 2, 33);
+    //draw unlock button
+    unlockButton.draw();
+    //draw unlock text
+    ctxTarget.fillStyle = TARGET_COLOR_FONT;
+    ctxTarget.font = "bold 18px arial";
+    ctxTarget.textAlign = "center";
+    ctxTarget.fillText("UNLOCK", TC_WIDTH / 2, UNLOCK_Y + 5);
 }
 
 function createTarget(currentTargetName) {
@@ -538,9 +613,24 @@ function createTarget(currentTargetName) {
             console.log("Error while selecting forms for the target");
             break;
     }
-    return currentTarget
+    return currentTarget;
 }
 
+function chronometer() {
+    end = new Date();
+    diff = end - start;
+    diff = new Date(diff);
+    var sec = diff.getSeconds();
+    var min = diff.getMinutes();
+    if (min < 10) {
+        min = "0" + min;
+    }
+    if (sec < 10) {
+        sec = "0" + sec;
+    }
+    timer = min + ":" + sec;
+    return timer;
+}
 
 
 //------------------------------------------------------------------------------
