@@ -2,7 +2,7 @@
 //probablement à transferer dans un autre fichier js quand on saura comment faire
 
 class Square {
-    constructor(x, y, w, h, selectable, context = ctx) {
+    constructor(x, y, w, h, selectable, context = ctxFormsBoard) {
         this.w = w;
         this.h = h;
         this.bottom = y + h / 2;
@@ -36,7 +36,7 @@ class Square {
 }
 
 class Cross {
-    constructor(x, y, w, h, thickness, selectable, context = ctx) {
+    constructor(x, y, w, h, thickness, selectable, context = ctxFormsBoard) {
         this.w = w;
         this.h = h;
         this.thickness = thickness
@@ -77,7 +77,7 @@ class Cross {
 }
 
 class Circle {
-    constructor(x, y, radius, selectable, context = ctx) {
+    constructor(x, y, radius, selectable, context = ctxFormsBoard) {
         this.x = x;
         this.y = y;
         this.radius = radius;
@@ -111,7 +111,7 @@ class Circle {
 }
 
 class Triangle {
-    constructor(x, y, h, selectable, context = ctx) {
+    constructor(x, y, h, selectable, context = ctxFormsBoard) {
         this.x = x;
         this.y = y;
         this.h = h;
@@ -167,7 +167,7 @@ class Triangle {
 }
 
 class Indexer {
-    constructor(x, y, w, h, ctx = ctx2) {
+    constructor(x, y, w, h, ctx = ctxTimeline) {
         this.x = x;
         this.y = y;
         this.w = w;
@@ -216,8 +216,8 @@ canvTimeline.width = TL_WIDTH;
 var currentStep = 0;
 
 //set up context
-var ctx2 = canvTimeline.getContext("2d");
-//ctx2.lineWidth = STROKE;
+var ctxTimeline = canvTimeline.getContext("2d");
+//index
 var indexStep = new Indexer(getTimelineGridX(0), getTimelineGridY(), INDEX_SIZE, INDEX_SIZE);
 
 var formTimeline = [];
@@ -225,16 +225,16 @@ for (let i = 0; i < STEP; i++) {
     currentForm = null;
     switch (formsList[Math.floor(Math.random() * formsList.length)]) {
         case "Square":
-            currentForm = new Square(getTimelineGridX(i), getTimelineGridY(), MIN_SQUARE_SIZE, MIN_SQUARE_SIZE, false, ctx2);
+            currentForm = new Square(getTimelineGridX(i), getTimelineGridY(), MIN_SQUARE_SIZE, MIN_SQUARE_SIZE, false, ctxTimeline);
             break;
         case "Circle":
-            currentForm = new Circle(getTimelineGridX(i), getTimelineGridY(), MIN_CIRCLE_RADIUS, false, ctx2);
+            currentForm = new Circle(getTimelineGridX(i), getTimelineGridY(), MIN_CIRCLE_RADIUS, false, ctxTimeline);
             break;
         case "Triangle":
-            currentForm = new Triangle(getTimelineGridX(i), getTimelineGridY(), MIN_TRIANGLE_HEIGHT, false, ctx2);
+            currentForm = new Triangle(getTimelineGridX(i), getTimelineGridY(), MIN_TRIANGLE_HEIGHT, false, ctxTimeline);
             break;
         case "Cross":
-            currentForm = new Cross(getTimelineGridX(i), getTimelineGridY(), MIN_SQUARE_SIZE, MIN_SQUARE_SIZE, MIN_CROSS_THICKNESS, false, ctx2);
+            currentForm = new Cross(getTimelineGridX(i), getTimelineGridY(), MIN_SQUARE_SIZE, MIN_SQUARE_SIZE, MIN_CROSS_THICKNESS, false, ctxTimeline);
             break;
         default:
             console.log("Error while selecting forms for the timeline");
@@ -257,9 +257,9 @@ function getTimelineGridY() {
 }
 
 function drawStep() {
-    ctx2.fillStyle = COLOR_FONT;
-    ctx2.font = "bold 18px arial";
-    ctx2.fillText("Step " + (currentStep + 1) + "/" + STEP, 2, 23);
+    ctxTimeline.fillStyle = COLOR_FONT;
+    ctxTimeline.font = "bold 18px arial";
+    ctxTimeline.fillText("Step " + (currentStep + 1) + "/" + STEP, 2, 23);
     for (let form of formTimeline) {
         form.draw();
     }
@@ -267,10 +267,10 @@ function drawStep() {
 }
 
 function drawTimelineBoard() {
-    ctx2.fillStyle = COLOR_TIMELINEBOARD;
-    //ctx2.strokeStyle = COLOR_TIMELINEBOARDER;
-    ctx2.fillRect(0, 0, TL_WIDTH, TL_HEIGHT);
-    //ctx2.strokeRect(STROKE / 2, STROKE / 2, WIDTH - STROKE, HEIGHT - STROKE)
+    ctxTimeline.fillStyle = COLOR_TIMELINEBOARD;
+    //ctxTimeline.strokeStyle = COLOR_TIMELINEBOARDER;
+    ctxTimeline.fillRect(0, 0, TL_WIDTH, TL_HEIGHT);
+    //ctxTimeline.strokeRect(STROKE / 2, STROKE / 2, WIDTH - STROKE, HEIGHT - STROKE)
 }
 //-----------------------------------------------------------------------------------
 //                              set up formBoardCanvas
@@ -312,8 +312,8 @@ canv.style.top = String(TL_HEIGHT) + "px"; //set the top here because of canvasT
 var canvBoundings = canv.getBoundingClientRect();
 
 //set up context
-var ctx = canv.getContext("2d");
-ctx.lineWidth = STROKE;
+var ctxFormsBoard = canv.getContext("2d");
+ctxFormsBoard.lineWidth = STROKE;
 
 
 //start a new game with tab of differents forms
@@ -328,6 +328,7 @@ canv.addEventListener("mousedown", selectForm); //add highlights with mouse clic
 
 
 //set up the game loop
+//method repeats a given function at every given time-interval
 setInterval(loop, 1000 / FPS);
 
 //-----------------functions----------------
@@ -336,13 +337,16 @@ function loop() {
     drawForms(formsBoard);
     drawTimelineBoard();
     drawStep();
+    drawScore();
+    drawTarget();
+    drawLearning();
 }
 
 function drawBoard() {
-    ctx.fillStyle = COLOR_BOARD;
-    ctx.strokeStyle = COLOR_BOARDER;
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.strokeRect(STROKE / 2, STROKE / 2, WIDTH - STROKE, HEIGHT - STROKE)
+    ctxFormsBoard.fillStyle = COLOR_BOARD;
+    ctxFormsBoard.strokeStyle = COLOR_BOARDER;
+    ctxFormsBoard.fillRect(0, 0, WIDTH, HEIGHT);
+    ctxFormsBoard.strokeRect(STROKE / 2, STROKE / 2, WIDTH - STROKE, HEIGHT - STROKE);
 }
 
 function drawForms(formsBoard) {
@@ -422,9 +426,6 @@ function selectForm( /* type MouseEvent*/ event) {
             if (form.contains(x, y) && form.selectable && !form.selected) {
                 form.selected = true; //create this attribute !
                 nbCurrentFormSelected++;
-                if (nbCurrentFormSelected >= nbFormToSelect) {
-                    gameUpdate();
-                }
                 break OUTER; //if one form is to highlight no need to look further
             }
         }
@@ -434,22 +435,182 @@ function selectForm( /* type MouseEvent*/ event) {
 function gameUpdate() {
     formTimeline[currentStep].highlight = true;
     currentStep++;
+    currentScore += 10;
     if (currentStep >= STEP) {
         console.log("END OF THE GAME");
         return;
     }
     indexStep.x = getTimelineGridX(currentStep);
+    currentTarget = createTarget(formTimeline[currentStep].constructor.name)
     boardInfos = newGame(formTimeline[currentStep].constructor.name);
     formsBoard = boardInfos.formsBoard;
     nbFormToSelect = boardInfos.nbFormToSelect;
     nbCurrentFormSelected = 0;
 }
 
+//------------------------------------------------------------------------------
+//                             scoreCanvas
+//------------------------------------------------------------------------------
+const SC_HEIGHT = 50;
+const SC_WIDTH = 160;
+const SCORE_COLOR_FONT = COLOR_BOARDER;
+
+var scoreCanvas = document.getElementById("scoreCanvas");
+scoreCanvas.height = SC_HEIGHT;
+scoreCanvas.width = SC_WIDTH;
+scoreCanvas.style.top = String(TL_HEIGHT) + "px";
+scoreCanvas.style.left = String(WIDTH + STROKE) + "px";
+
+//score value
+var currentScore = 0;
+
+//set up context
+var ctxScore = scoreCanvas.getContext("2d");
+ctxScore.lineWidth = STROKE;
+
+//--------------------------------  function ---------------------------------
+function drawScore() {
+    //draw Score Board
+    ctxScore.fillStyle = COLOR_BOARD;
+    ctxScore.strokeStyle = COLOR_BOARDER;
+    ctxScore.fillRect(0, 0, SC_WIDTH, SC_HEIGHT);
+    ctxScore.strokeRect(STROKE / 2, STROKE / 2, SC_WIDTH - STROKE, SC_HEIGHT - STROKE);
+    //draw the text
+    ctxScore.fillStyle = SCORE_COLOR_FONT;
+    ctxScore.font = "bold 18px arial";
+    ctxScore.fillText("SCORE : " + currentScore, 20, SC_HEIGHT / 2 + 9); //magic numbers ...
+
+}
+
+//------------------------------------------------------------------------------
+//                             targetCanvas
+//------------------------------------------------------------------------------
+
+const TC_HEIGHT = 160; //target canvas height
+const TC_WIDTH = 160; //target canvas width
+const TC_TOP_MARGIN = 50;
+const TC_CELL = 100;
+const TC_CIRCLE_RADIUS = TC_CELL / 4;
+const TC_SQUARE_SIZE = TC_CELL / 2;
+const TC_TRIANGLE_HEIGHT = TC_CELL / 2;
+const TC_CROSS_THICKNESS = TC_CELL / 8;
+const TARGET_COLOR_FONT = "red";
+
+var targetCanvas = document.getElementById("targetCanvas");
+targetCanvas.height = TC_HEIGHT;
+targetCanvas.width = TC_WIDTH;
+targetCanvas.style.top = String(TL_HEIGHT + SC_HEIGHT + TC_TOP_MARGIN) + "px";
+targetCanvas.style.left = String(WIDTH + STROKE) + "px";
+
+//set up context
+var ctxTarget = targetCanvas.getContext("2d");
+ctxTarget.lineWidth = STROKE;
+
+var currentTarget = createTarget(formTimeline[0].constructor.name);
+
+
+//--------------------------------  function ---------------------------------
+function drawTarget() {
+    //draw Target Board
+    ctxTarget.fillStyle = COLOR_BOARD;
+    ctxTarget.strokeStyle = COLOR_BOARDER;
+    ctxTarget.fillRect(0, 0, TC_WIDTH, TC_HEIGHT);
+    ctxTarget.strokeRect(STROKE / 2, STROKE / 2, TC_WIDTH - STROKE, TC_HEIGHT - STROKE);
+    //draw the target
+    currentTarget.draw()
+}
+
+function createTarget(currentTargetName) {
+    switch (currentTargetName) {
+        case "Square":
+            currentTarget = new Square(TC_WIDTH / 2, TC_HEIGHT / 2, TC_SQUARE_SIZE, TC_SQUARE_SIZE, false, ctxTarget);
+            break;
+        case "Circle":
+            currentTarget = new Circle(TC_WIDTH / 2, TC_HEIGHT / 2, TC_CIRCLE_RADIUS, false, ctxTarget);
+            break;
+        case "Triangle":
+            currentTarget = new Triangle(TC_WIDTH / 2, TC_HEIGHT / 2, TC_TRIANGLE_HEIGHT, false, ctxTarget);
+            break;
+        case "Cross":
+            currentTarget = new Cross(TC_WIDTH / 2, TC_HEIGHT / 2, TC_SQUARE_SIZE, TC_SQUARE_SIZE, TC_CROSS_THICKNESS, false, ctxTarget);
+            break;
+        default:
+            console.log("Error while selecting forms for the target");
+            break;
+    }
+    return currentTarget
+}
+
+
+
+//------------------------------------------------------------------------------
+//                             learningCanvas
+//------------------------------------------------------------------------------
+const LC_CELL = 70;
+const LC_MARGIN = LC_CELL; //tester differentes valeurs
+const LC_HEIGHT = LC_CELL * (formsList.length + 1); //LearningCanvas Height
+const LC_WIDTH = 3 * LC_CELL; //LearningCanvas Width
+const LC_CIRCLE_RADIUS = LC_CELL / 4;
+const LC_SQUARE_SIZE = LC_CELL / 2;
+const LC_TRIANGLE_HEIGHT = LC_CELL / 2;
+const LC_CROSS_THICKNESS = LC_CELL / 8;
+
+var learningCanvas = document.getElementById("learningCanvas");
+learningCanvas.height = LC_HEIGHT;
+learningCanvas.width = LC_WIDTH;
+learningCanvas.style.top = String(TL_HEIGHT) + "px";
+learningCanvas.style.left = String(WIDTH + STROKE + SC_WIDTH + STROKE) + "px";
+
+//set up context
+var ctxLearning = learningCanvas.getContext("2d");
+ctxLearning.lineWidth = STROKE;
+
+const learningForms = [
+    new Square(getLearningGridX(), getLearningGridY(0), LC_SQUARE_SIZE, LC_SQUARE_SIZE, false, ctxLearning),
+    new Circle(getLearningGridX(), getLearningGridY(1), LC_CIRCLE_RADIUS, false, ctxLearning),
+    new Triangle(getLearningGridX(), getLearningGridY(2), LC_TRIANGLE_HEIGHT, false, ctxLearning),
+    new Cross(getLearningGridX(), getLearningGridY(3), LC_SQUARE_SIZE, LC_SQUARE_SIZE, LC_CROSS_THICKNESS, false, ctxLearning)
+];
+
+//-----------------------------   function   -----------------------------------
+
+function getLearningGridX() {
+    return LC_CELL;
+}
+
+function getLearningGridY(row) {
+    return LC_MARGIN + CELL * row;
+}
+
+function drawLearning() {
+    //draw Learning Board
+    ctxLearning.fillStyle = COLOR_BOARD;
+    ctxLearning.strokeStyle = COLOR_BOARDER;
+    ctxLearning.fillRect(0, 0, LC_WIDTH, LC_HEIGHT);
+    ctxLearning.strokeRect(STROKE / 2, STROKE / 2, LC_WIDTH - STROKE, LC_HEIGHT - STROKE);
+    //draw forms
+    for (let form of learningForms) {
+        form.draw();
+    }
+}
+
+//------------------------------------------------------------------------------
+//                              Button
+//------------------------------------------------------------------------------
+
+var button = document.getElementById("nextButton");
+//find a better way to choose the position of the button
+button.style.top = String(TL_HEIGHT + HEIGHT - button.height) + "px;";
+button.style.margin = String(WIDTH + STROKE) + "px";
+
+//--------------------    function   -------------------------------------------
+button.onclick = function() {
+    if (nbCurrentFormSelected >= nbFormToSelect) {
+        gameUpdate();
+    }
+}
+
 
 //------------------------------------------------------------------------------
 //                              Animation
 //------------------------------------------------------------------------------
-const canvasFromBoard = document.querySelector("#formsBoardCanvas");
-const tml = new TimelineMax();
-
-tml.fromTo(canvasFromBoard, 1, { height: "0%" }, { height: "100%" });

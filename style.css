@@ -8,3 +8,15 @@
     position: absolute;
     left: 0;
 }
+
+#learningCanvas {
+    position: absolute;
+}
+
+#scoreCanvas {
+    position: absolute;
+}
+
+#targetCanvas {
+    position: absolute;
+}
