@@ -300,7 +300,7 @@ const COLOR_CROSS_LIT = "lightgreen";
 const COLOR_CIRCLE = "royalblue";
 const COLOR_CIRCLE_LIT = "lightsteelblue";
 const COLOR_TRIANGLE = "darkorange";
-const COLOR_TRIANGLE_LIT = "lightsalmon";
+const COLOR_TRIANGLE_LIT = "#ffcc66";
 const COLOR_SELECT = "white";
 
 //set up game canvas 
