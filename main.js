@@ -19,7 +19,7 @@ class Square {
         if (this.selected) {
             this.ctx.fillStyle = COLOR_SQUARE;
             this.ctx.fillRect(this.left - SELECT_MARGIN / 2, this.top - SELECT_MARGIN / 2, this.w + SELECT_MARGIN, this.h + SELECT_MARGIN);
-            this.ctx.fillStyle = COLOR_SELECT;
+            this.ctx.fillStyle = COLOR_SQUARE_LIT; //COLOR_SELECT;
 
         } else if (this.highlight) {
             this.ctx.fillStyle = COLOR_SQUARE_LIT;
@@ -56,7 +56,7 @@ class Cross {
             this.ctx.fillStyle = COLOR_CROSS
             this.ctx.fillRect(this.rect1x - SELECT_MARGIN / 2, this.rect1y - SELECT_MARGIN / 2, this.thickness + SELECT_MARGIN, this.h + SELECT_MARGIN);
             this.ctx.fillRect(this.rect2x - SELECT_MARGIN / 2, this.rect2y - SELECT_MARGIN / 2, this.w + SELECT_MARGIN, this.thickness + SELECT_MARGIN);
-            this.ctx.fillStyle = COLOR_SELECT;
+            this.ctx.fillStyle = COLOR_CROSS_LIT; //COLOR_SELECT;
 
         } else if (this.highlight) {
             this.ctx.fillStyle = COLOR_CROSS_LIT;
@@ -94,7 +94,7 @@ class Circle {
             this.ctx.beginPath();
             this.ctx.arc(this.x, this.y, this.radius + SELECT_MARGIN / 2, 0, Math.PI * 2);
             this.ctx.fill();
-            this.ctx.fillStyle = COLOR_SELECT;
+            this.ctx.fillStyle = COLOR_CIRCLE_LIT; //COLOR_SELECT;
         } else if (this.highlight) {
             this.ctx.fillStyle = COLOR_CIRCLE_LIT;
         } else {
@@ -145,7 +145,7 @@ class Triangle {
             this.ctx.lineTo(this.t2.x, this.t2.y - SELECT_MARGIN);
             this.ctx.lineTo(this.t3.x + SELECT_MARGIN, this.t3.y + SELECT_MARGIN / 2);
             this.ctx.fill();
-            this.ctx.fillStyle = COLOR_SELECT;
+            this.ctx.fillStyle = COLOR_TRIANGLE_LIT; //COLOR_SELECT;
 
         } else if (this.highlight) {
             this.ctx.fillStyle = COLOR_TRIANGLE_LIT;
@@ -444,3 +444,12 @@ function gameUpdate() {
     nbFormToSelect = boardInfos.nbFormToSelect;
     nbCurrentFormSelected = 0;
 }
+
+
+//------------------------------------------------------------------------------
+//                              Animation
+//------------------------------------------------------------------------------
+const canvasFromBoard = document.querySelector("#formsBoardCanvas");
+const tml = new TimelineMax();
+
+tml.fromTo(canvasFromBoard, 1, { height: "0%" }, { height: "100%" });
