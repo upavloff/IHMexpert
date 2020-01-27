@@ -13,10 +13,11 @@ class Square {
         this.selectable = selectable;
         this.selected = false;
         this.ctx = context; //necessary because of different canvas
+        this.unlocked = false;
     }
 
     draw() {
-        if (this.selected) {
+        if (this.selected || this.unlocked) {
             this.ctx.fillStyle = COLOR_SQUARE;
             this.ctx.fillRect(this.left - SELECT_MARGIN / 2, this.top - SELECT_MARGIN / 2, this.w + SELECT_MARGIN, this.h + SELECT_MARGIN);
             this.ctx.fillStyle = COLOR_SQUARE_LIT; //COLOR_SELECT;
@@ -48,11 +49,11 @@ class Cross {
         this.selectable = selectable;
         this.selected = false;
         this.ctx = context; //necessary because of different canvas
-
+        this.unlocked = false;
     }
 
     draw() {
-        if (this.selected) { // not done -------------------------------
+        if (this.selected || this.unlocked) { // not done -------------------------------
             this.ctx.fillStyle = COLOR_CROSS
             this.ctx.fillRect(this.rect1x - SELECT_MARGIN / 2, this.rect1y - SELECT_MARGIN / 2, this.thickness + SELECT_MARGIN, this.h + SELECT_MARGIN);
             this.ctx.fillRect(this.rect2x - SELECT_MARGIN / 2, this.rect2y - SELECT_MARGIN / 2, this.w + SELECT_MARGIN, this.thickness + SELECT_MARGIN);
@@ -85,11 +86,11 @@ class Circle {
         this.selectable = selectable;
         this.selected = false;
         this.ctx = context; //necessary because of different canvas
-
+        this.unlocked = false;
     }
 
     draw() {
-        if (this.selected) {
+        if (this.selected || this.unlocked) {
             this.ctx.fillStyle = COLOR_CIRCLE;
             this.ctx.beginPath();
             this.ctx.arc(this.x, this.y, this.radius + SELECT_MARGIN / 2, 0, Math.PI * 2);
@@ -119,7 +120,8 @@ class Triangle {
         this.selectable = selectable;
         this.selected = false;
         this.ctx = context; //necessary because of different canvas
-
+        this.unlocked = false;
+        this.unlocked = false;
         //coordinates
         this.t1 = { x: this.x - this.h / 2, y: this.y + this.h / 2 }; //left coin /_
         this.t2 = { x: this.x, y: this.y - this.h / 2 }; //top coin /\
@@ -138,7 +140,7 @@ class Triangle {
         return this.a_t2_t3 * x + this.b_t2_t3;
     }
     draw() {
-        if (this.selected) {
+        if (this.selected || this.unlocked) {
             this.ctx.fillStyle = COLOR_TRIANGLE;
             this.ctx.beginPath();
             this.ctx.moveTo(this.t1.x - SELECT_MARGIN, this.t1.y + SELECT_MARGIN / 2);
@@ -167,6 +169,7 @@ class Triangle {
 }
 
 class Indexer {
+    //sqare in the timeline canvas showing the current form to select
     constructor(x, y, w, h, ctx = ctxTimeline) {
         this.x = x;
         this.y = y;
@@ -232,6 +235,7 @@ class Button {
 //-----------------------------------------------------------------------------------
 //careful if changed this list has to be in the same order as the forms in the learning board
 var formsList = ["Square", "Circle", "Triangle", "Cross"];
+var learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
 
 //--------------------------------------------------------------------------------
 //                        set up the timeline canvas 
@@ -263,7 +267,6 @@ var ctxTimeline = canvTimeline.getContext("2d");
 var indexStep = new Indexer(getTimelineGridX(0), getTimelineGridY(), INDEX_SIZE, INDEX_SIZE);
 
 var formTimeline = [];
-var nameCurrentForm = "";
 
 for (let i = 0; i < STEP; i++) {
     currentForm = null;
@@ -286,8 +289,10 @@ for (let i = 0; i < STEP; i++) {
     }
 
     formTimeline[i] = currentForm;
-    nameCurrentForm = currentForm.constructor.name;
 }
+
+var nameCurrentForm = formTimeline[0].constructor.name;
+
 
 //-------------------------------- functions ---------------------------------
 
@@ -324,7 +329,7 @@ function drawTimelineBoard() {
 const FPS = 30; //frames per second
 const HEIGHT = 510;
 const WIDTH = 495;
-const GRID_SIZE = 5; //number of rows(and columns)
+const GRID_SIZE = 4; //number of rows(and columns)
 
 const CELL = WIDTH / (GRID_SIZE + 2); //size of cells
 const STROKE = CELL / 12; //stroke width
@@ -370,7 +375,6 @@ var nbCurrentFormSelected = 0;
 //event handlers
 canv.addEventListener("mousemove", highlightForm); //add highlights just with mousemouve
 canv.addEventListener("mousedown", selectForm); //add highlights with mouse click
-
 
 //set up the game loop
 //method repeats a given function at every given time-interval
@@ -421,15 +425,27 @@ function newGame(selectableForm) { //add number of each form or the proportion i
             if (alea < 1 / 4) {
                 formsBoard[i][j] = new Square(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, selectableForm == "Square");
                 nbFormToSelect += selectableForm == "Square" ? 1 : 0;
+                if (learningState['Square'] == "unlocked"){
+                    formsBoard[i][j].selected = true;
+                }
             } else if (alea < 2 / 4) {
                 formsBoard[i][j] = new Circle(getGridX(j), getGridY(i), CIRCLE_RADIUS, selectableForm == "Circle");
                 nbFormToSelect += selectableForm == "Circle" ? 1 : 0;
+                if (learningState['Circle'] == "unlocked"){
+                    formsBoard[i][j].selected = true;
+                }
             } else if (alea < 3 / 4) {
                 formsBoard[i][j] = new Cross(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, CROSS_THICKNESS, selectableForm == "Cross");
                 nbFormToSelect += selectableForm == "Cross" ? 1 : 0;
+                if (learningState['Cross'] == "unlocked"){
+                    formsBoard[i][j].selected = true;
+                }
             } else {
                 formsBoard[i][j] = new Triangle(getGridX(j), getGridY(i), TRIANGLE_HEIGHT, selectableForm == "Triangle");
                 nbFormToSelect += selectableForm == "Triangle" ? 1 : 0;
+                if (learningState['Triangle'] == "unlocked"){
+                    formsBoard[i][j].selected = true;
+                }
             }
         }
     }
@@ -480,6 +496,7 @@ function selectForm( /* type MouseEvent*/ event) {
 }
 
 function gameUpdate() {
+    start = new Date();
     formTimeline[currentStep].highlight = true;
     currentStep++;
     currentScore += 10;
@@ -491,7 +508,7 @@ function gameUpdate() {
     nameCurrentForm = formTimeline[currentStep].constructor.name;
     indexStep.x = getTimelineGridX(currentStep);
     currentTarget = createTarget(nameCurrentForm)
-    boardInfos = newGame(nameCurrentForm);
+    boardInfos = newGame( learningState[nameCurrentForm]=='unlocked' ? 'nothing to select' : nameCurrentForm);
     formsBoard = boardInfos.formsBoard;
     nbFormToSelect = boardInfos.nbFormToSelect;
     nbCurrentFormSelected = 0;
@@ -607,6 +624,9 @@ function unlocker( /* type MouseEvent*/ event) {
         if (learningState[nameCurrentForm] <= NB_LOCKS && unlockable) {
             learningState[nameCurrentForm] += 1;
             unlockable = false;
+            if (learningState[nameCurrentForm] == NB_LOCKS){
+                learningState[nameCurrentForm] = "unlocked";
+            }
         }
     }
 }
@@ -694,7 +714,6 @@ learningCanvas.width = LC_WIDTH;
 learningCanvas.style.top = String(TL_HEIGHT) + "px";
 learningCanvas.style.left = String(WIDTH + STROKE + SC_WIDTH + STROKE) + "px";
 
-var learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
 //load img
 var imgLock = new Image();
 imgLock.src = 'lock.png';
@@ -746,7 +765,7 @@ function drawLearning() {
 function drawLocks() {
     for (let i = 0; i < formsList.length; i++) {
         for (let j = 0; j < NB_LOCKS; j++) {
-            if (learningState[formsList[i]] > j) {
+            if (learningState[formsList[i]] > j || learningState[formsList[i]]=='unlocked') {
                 ctxLearning.drawImage(imgUnlock, getImgGridX(j), getImgGridY(i), IMG_WIDTH, IMG_HEIGHT);
             } else {
                 ctxLearning.drawImage(imgLock, getImgGridX(j), getImgGridY(i), IMG_WIDTH, IMG_HEIGHT);
