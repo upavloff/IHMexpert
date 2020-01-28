@@ -20,3 +20,11 @@
 #targetCanvas {
     position: absolute;
 }
+
+#nextButton {
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+    padding: 10px 30px;
+    /*background: rgb(70, 230, 52);*/
+}
