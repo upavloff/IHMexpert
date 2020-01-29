@@ -425,25 +425,25 @@ function newGame(selectableForm) { //add number of each form or the proportion i
             if (alea < 1 / 4) {
                 formsBoard[i][j] = new Square(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, selectableForm == "Square");
                 nbFormToSelect += selectableForm == "Square" ? 1 : 0;
-                if (learningState['Square'] == "unlocked"){
+                if (learningState['Square'] == "unlocked") {
                     formsBoard[i][j].selected = true;
                 }
             } else if (alea < 2 / 4) {
                 formsBoard[i][j] = new Circle(getGridX(j), getGridY(i), CIRCLE_RADIUS, selectableForm == "Circle");
                 nbFormToSelect += selectableForm == "Circle" ? 1 : 0;
-                if (learningState['Circle'] == "unlocked"){
+                if (learningState['Circle'] == "unlocked") {
                     formsBoard[i][j].selected = true;
                 }
             } else if (alea < 3 / 4) {
                 formsBoard[i][j] = new Cross(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, CROSS_THICKNESS, selectableForm == "Cross");
                 nbFormToSelect += selectableForm == "Cross" ? 1 : 0;
-                if (learningState['Cross'] == "unlocked"){
+                if (learningState['Cross'] == "unlocked") {
                     formsBoard[i][j].selected = true;
                 }
             } else {
                 formsBoard[i][j] = new Triangle(getGridX(j), getGridY(i), TRIANGLE_HEIGHT, selectableForm == "Triangle");
                 nbFormToSelect += selectableForm == "Triangle" ? 1 : 0;
-                if (learningState['Triangle'] == "unlocked"){
+                if (learningState['Triangle'] == "unlocked") {
                     formsBoard[i][j].selected = true;
                 }
             }
@@ -508,7 +508,7 @@ function gameUpdate() {
     nameCurrentForm = formTimeline[currentStep].constructor.name;
     indexStep.x = getTimelineGridX(currentStep);
     currentTarget = createTarget(nameCurrentForm)
-    boardInfos = newGame( learningState[nameCurrentForm]=='unlocked' ? 'nothing to select' : nameCurrentForm);
+    boardInfos = newGame(learningState[nameCurrentForm] == 'unlocked' ? 'nothing to select' : nameCurrentForm);
     formsBoard = boardInfos.formsBoard;
     nbFormToSelect = boardInfos.nbFormToSelect;
     nbCurrentFormSelected = 0;
@@ -624,7 +624,7 @@ function unlocker( /* type MouseEvent*/ event) {
         if (learningState[nameCurrentForm] <= NB_LOCKS && unlockable) {
             learningState[nameCurrentForm] += 1;
             unlockable = false;
-            if (learningState[nameCurrentForm] == NB_LOCKS){
+            if (learningState[nameCurrentForm] == NB_LOCKS) {
                 learningState[nameCurrentForm] = "unlocked";
             }
         }
@@ -765,7 +765,7 @@ function drawLearning() {
 function drawLocks() {
     for (let i = 0; i < formsList.length; i++) {
         for (let j = 0; j < NB_LOCKS; j++) {
-            if (learningState[formsList[i]] > j || learningState[formsList[i]]=='unlocked') {
+            if (learningState[formsList[i]] > j || learningState[formsList[i]] == 'unlocked') {
                 ctxLearning.drawImage(imgUnlock, getImgGridX(j), getImgGridY(i), IMG_WIDTH, IMG_HEIGHT);
             } else {
                 ctxLearning.drawImage(imgLock, getImgGridX(j), getImgGridY(i), IMG_WIDTH, IMG_HEIGHT);
@@ -789,7 +789,6 @@ button.onclick = function() {
         gameUpdate();
     }
 }
-
 
 //------------------------------------------------------------------------------
 //                              Animation
