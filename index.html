@@ -23,36 +23,6 @@
 
     <script src="main.js"></script>
     
-    <!-- FireBase -->
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/7.8.0/firebase.js"></script>
-
-    <!-- TODO: Add SDKs for Firebase products that you want to use
-         https://firebase.google.com/docs/web/setup#available-libraries -->
-    <script src="https://www.gstatic.com/firebasejs/7.8.0/firebase-analytics.js"></script>
-
-    <script>
-      // Your web app's Firebase configuration
-      var firebaseConfig = {
-        apiKey: "AIzaSyAS-N063Ia0zSq0cplHD2QvolQUPlXHCQU",
-        authDomain: "ihmexpert-a264c.firebaseapp.com",
-        databaseURL: "https://ihmexpert-a264c.firebaseio.com",
-        projectId: "ihmexpert-a264c",
-        storageBucket: "ihmexpert-a264c.appspot.com",
-        messagingSenderId: "924071609066",
-        appId: "1:924071609066:web:22fac422bfeff7184d8d93",
-        measurementId: "G-R1TZ3NCMDV"
-      };
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-      firebase.analytics();
-        
-      firebase.database().ref('user1').set({
-        name : "Test",
-        email : "this better work..."
-      });
-    </script>
-    
 </body>
 
 </html>
