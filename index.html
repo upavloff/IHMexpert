@@ -46,6 +46,11 @@
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
       firebase.analytics();
+        
+      firebase.database().ref('user1').set({
+        name : "Test",
+        email : "this better work..."
+      });
     </script>
     
 </body>
