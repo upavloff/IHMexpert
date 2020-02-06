@@ -1,0 +1,24 @@
+{
+    "name": "IHMexpert",
+    "version": "1.0.0",
+    "description": "try it : https://ulrych8.github.io/IHMexpert/index.html ------ Notre projet vise à répondre à la question \"Pourquoi ne devenons nous pas des experts ?\".",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ulrych8/IHMexpert.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "epress": "4.17.1",
+        "nedb": "1.8.0"
+    },
+    "bugs": {
+        "url": "https://github.com/ulrych8/IHMexpert/issues"
+    },
+    "homepage": "https://github.com/ulrych8/IHMexpert/index.html"
+}

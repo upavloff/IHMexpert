@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>IHM expert -> data</title>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+</head>
+
+<body>
+    <h1>Right here :</h1>
+    <script>
+        getData();
+        async function getData() {
+            const response = await fetch('/getData');
+            const data = await response.json();
+            for (element of data) {
+                const root = document.createElement('p');
+                const posX = document.createElement('div');
+                const posY = document.createElement('div');
+                const date = document.createElement('div');
+
+                posX.textContent = `pos x : ${element.x}`;
+                posY.textContent = `pos y : ${element.y}`;
+                const dateString = new Date(element.timestamp).toLocaleString();
+                date.textContent = dateString;
+
+                root.append(posX, posY, date);
+                document.body.append(root);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
