@@ -12,7 +12,7 @@
     <script>
         getData();
         async function getData() {
-            const response = await fetch('/getData');
+            const response = await fetch('/api');
             const data = await response.json();
             for (element of data) {
                 const root = document.createElement('p');
