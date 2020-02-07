@@ -16,7 +16,8 @@
     "dependencies": {
         "epress": "4.17.1",
         "nedb": "1.8.0",
-        "dotenv": "8.2.0"
+        "dotenv": "8.2.0",
+        "cors": "^2.8.5"
     },
     "bugs": {
         "url": "https://github.com/ulrych8/IHMexpert/issues"
