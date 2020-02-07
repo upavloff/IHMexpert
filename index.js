@@ -1,11 +1,12 @@
 const express = require('express');
 const Datastore = require('nedb');
 require('dotenv').config;
-
+const cors = require('cors')
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 app.listen(port, () => console.log(`listening at ${port}...`));
 app.use(express.static('./'));
+app.use(cors);
 //to parse incomming data as json
 app.use(express.json( /*{limit:'1mb'} */ ));
 
@@ -13,7 +14,7 @@ const database = new Datastore('database.db');
 database.loadDatabase();
 
 
-app.get('/getData', (request, response) => {
+app.get('/api' /*getData*/ , (request, response) => {
     database.find({}, (err, data) => {
         if (err) {
             response.end();

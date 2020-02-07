@@ -3,17 +3,17 @@ const options = {
     headers: {
         'Content-Type': 'application/json'
     },
-    body: null
+    body: {}
 };
 
-bodytemp = document.body
+const bodytemp = document.body
 bodytemp.addEventListener("mousedown", infoPOSTING);
 
 async function infoPOSTING( /* mouse event*/ event) {
     let x = event.clientX;
     let y = event.clientY;
     options.body = JSON.stringify({ x: x, y: y });
-    const response = await fetch('http://localhost:3000/api', options);
+    const response = await fetch('/api', options);
     const data = await response.json();
     console.log(data);
 }
