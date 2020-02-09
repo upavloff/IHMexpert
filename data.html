@@ -106,7 +106,6 @@
             if (false && navigator.msSaveBlob) { // IE 10+
                 navigator.msSaveBlob(blob, exportedFilenmae);
             } else {
-                console.log('are we here');
                 var downloadButton = document.getElementById("downloadButton");
                 downloadButton.onclick = function() {
                     var link = document.createElement("a");

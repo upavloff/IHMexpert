@@ -548,8 +548,6 @@ function selectForm( /* type MouseEvent*/ event) {
 function gameUpdate() {
     //update Game Variable to save :
     nbLockLeft[currentStep] = learningState[nameCurrentForm];
-    console.log('nbTotalClick : ' + nbTotalClick);
-    console.log('nbuqefulll : ' + nbUsefulClick);
     if (nbTotalClick > nbUsefulClick) {
         errors.push(true);
         nbUsefulClick = nbTotalClick;
