@@ -7,12 +7,23 @@ const options = {
 };
 
 const bodytemp = document.body
-bodytemp.addEventListener("mousedown", infoPOSTING);
+bodytemp.addEventListener("mousedown", clickCount); //also
 
-async function infoPOSTING( /* mouse event*/ event) {
-    let x = event.clientX;
-    let y = event.clientY;
-    options.body = JSON.stringify({ x: x, y: y });
+function clickCount( /* mouse event*/ event) {
+    nbTotalClick++;
+}
+
+async function endGamePOSTING() {
+    options.body = JSON.stringify({
+        initDate: initDate,
+        ipUser: ipAdress, // adresse ip ?
+        // facteur : ?
+        nbTrials: nbTrials,
+        formNameTimeline: formNameTimeline,
+        errors: errors,
+        unlock: nbLockLeft,
+        nbClick: nbTotalClick
+    });
     const response = await fetch('/api', options);
     const data = await response.json();
     console.log(data);
@@ -254,13 +265,27 @@ class Button {
 //                            GAME PARAMETERS
 //-----------------------------------------------------------------------------------
 //careful if changed this list has to be in the same order as the forms in the learning board
-var formsList = ["Square", "Circle", "Triangle", "Cross"];
-var learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
-
+const formsList = ["Square", "Circle", "Triangle", "Cross"];
+const learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
+const nbTrials = 3;
+const initDate = Date.now();
+var ipAdress = null;
+$.getJSON("https://api.ipify.org?format=json", function(data) {
+    ipAdress = data.ip;
+});
+//--------------------------------------------------------------------------------
+//                  GAME variables to post in the database
+//--------------------------------------------------------------------------------
+var formNameTimeline = [];
+var errors = [];
+var nbLockLeft = []; //unlock state link to the formTimeline
+var nbTotalClick = 0;
+var nbUsefulClick = 0;
+//--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 //                        set up the timeline canvas 
 //--------------------------------------------------------------------------------
-const STEP = 20;
+const STEP = nbTrials;
 const MIN_SIZE = 20;
 const MIN_CIRCLE_RADIUS = MIN_SIZE / 4; //
 const MIN_SQUARE_SIZE = MIN_SIZE / 2; //      Same ratio
@@ -286,7 +311,7 @@ var ctxTimeline = canvTimeline.getContext("2d");
 //index
 var indexStep = new Indexer(getTimelineGridX(0), getTimelineGridY(), INDEX_SIZE, INDEX_SIZE);
 
-var formTimeline = [];
+var formTimeline = []; //<-- put in game variables to post in database
 
 for (let i = 0; i < STEP; i++) {
     currentForm = null;
@@ -313,6 +338,10 @@ for (let i = 0; i < STEP; i++) {
 
 var nameCurrentForm = formTimeline[0].constructor.name;
 
+//iniate formNameTimeline values
+for (i in formTimeline) {
+    formNameTimeline[i] = String(formTimeline[i].constructor.name);
+}
 
 //-------------------------------- functions ---------------------------------
 
@@ -509,6 +538,7 @@ function selectForm( /* type MouseEvent*/ event) {
             if (form.contains(x, y) && form.selectable && !form.selected) {
                 form.selected = true; //create this attribute !
                 nbCurrentFormSelected++;
+                nbUsefulClick++;
                 break OUTER; //if one form is to highlight no need to look further
             }
         }
@@ -516,13 +546,25 @@ function selectForm( /* type MouseEvent*/ event) {
 }
 
 function gameUpdate() {
-    start = new Date();
+    //update Game Variable to save :
+    nbLockLeft[currentStep] = learningState[nameCurrentForm];
+    console.log('nbTotalClick : ' + nbTotalClick);
+    console.log('nbuqefulll : ' + nbUsefulClick);
+    if (nbTotalClick > nbUsefulClick) {
+        errors.push(true);
+        nbUsefulClick = nbTotalClick;
+    } else {
+        errors.push(false);
+    }
+    //update Game
+    start = new Date(); //useful for chrono
     formTimeline[currentStep].highlight = true;
     currentStep++;
     currentScore += 10;
-    unlockable = true;
+    unlockable = true; //to authorize to unlock again
     if (currentStep >= STEP) {
         console.log("END OF THE GAME");
+        endGamePOSTING(); //post infos of the game
         return;
     }
     nameCurrentForm = formTimeline[currentStep].constructor.name;
@@ -644,6 +686,7 @@ function unlocker( /* type MouseEvent*/ event) {
         if (learningState[nameCurrentForm] <= NB_LOCKS && unlockable) {
             learningState[nameCurrentForm] += 1;
             unlockable = false;
+            nbUsefulClick++;
             if (learningState[nameCurrentForm] == NB_LOCKS) {
                 learningState[nameCurrentForm] = "unlocked";
             }
@@ -806,6 +849,7 @@ button.style.margin = String(WIDTH + STROKE) + "px";
 //--------------------    function   -------------------------------------------
 button.onclick = function() {
     if (nbCurrentFormSelected >= nbFormToSelect) {
+        nbUsefulClick++;
         gameUpdate();
     }
 }

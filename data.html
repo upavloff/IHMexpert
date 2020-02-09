@@ -8,27 +8,131 @@
 </head>
 
 <body>
-    <h1>Right here :</h1>
+    <h1>Data here :</h1>
+    <button id="downloadButton">download CSV file</button>
     <script>
-        getData();
         async function getData() {
             const response = await fetch('/api');
             const data = await response.json();
+            const dataNewFormat = [];
             for (element of data) {
                 const root = document.createElement('p');
-                const posX = document.createElement('div');
-                const posY = document.createElement('div');
-                const date = document.createElement('div');
+                const initDate = document.createElement('div');
+                const ipUser = document.createElement('div');
+                const nbTrials = document.createElement('div');
+                const formNameTimeline = document.createElement('div');
+                const errors = document.createElement('div');
+                const unlock = document.createElement('div');
+                const nbClick = document.createElement('div');
+                const duration = document.createElement('div');
 
-                posX.textContent = `pos x : ${element.x}`;
-                posY.textContent = `pos y : ${element.y}`;
-                const dateString = new Date(element.timestamp).toLocaleString();
-                date.textContent = dateString;
+                const dateString = new Date(element.initDate).toLocaleString();
+                initDate.textContent = dateString;
+                ipUser.textContent = 'ipUser : ' + element.ipUser;
+                nbTrials.textContent = `nbTrials : ${element.nbTrials}`;
+                formNameTimeline.textContent = 'formNameTimeline : ' + element.formNameTimeline.toString();
+                errors.textContent = 'errors : ' + element.errors.toString();
+                unlock.textContent = 'unlock : ' + element.unlock.toString();
+                nbClick.textContent = 'nbClick : ' + String(element.nbClick);
+                const dateDuration = new Date(element.duration);
+                duration.textContent = "durée : " + dateDuration.getMinutes() + ":" + dateDuration.getSeconds();
 
-                root.append(posX, posY, date);
+                root.append(initDate, ipUser, nbTrials, formNameTimeline, errors, unlock, nbClick, duration);
                 document.body.append(root);
+
+                for (i in element.formNameTimeline) {
+                    dataNewFormat.push({
+                        initDate: element.initDate,
+                        ipUser: element.ipUser,
+                        nbTrials: element.nbTrials,
+                        form: element.formNameTimeline[i],
+                        error: element.errors[i],
+                        unlock: element.unlock[i],
+                        nbClick: element.nbClick,
+                        duration: element.duration
+                    });
+                }
+            }
+            const headers = {
+                initDate: 'Date',
+                ipUser: 'User IP',
+                nbTrials: 'nb Trials',
+                form: 'Form Target',
+                error: 'Error',
+                unlock: 'Unlock State',
+                nbClick: 'nb Clicks',
+                duration: 'Duration'
+            }
+            return {
+                headers: headers,
+                data: dataNewFormat
+            };
+        }
+        //-------------------------------------------------------------------
+        //                      export to csv part
+        //-------------------------------------------------------------------
+        function convertToCSV(objArray) {
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str;
+        }
+
+        function exportCSVFile(headers, items, fileTitle) {
+            if (headers) {
+                items.unshift(headers);
+            }
+            // Convert Object to JSON
+            var jsonObject = JSON.stringify(items);
+
+            var csv = this.convertToCSV(jsonObject);
+
+            var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
+
+            var blob = new Blob([csv], {
+                type: 'text/csv;charset=utf-8;'
+            });
+            if (false && navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, exportedFilenmae);
+            } else {
+                console.log('are we here');
+                var downloadButton = document.getElementById("downloadButton");
+                downloadButton.onclick = function() {
+                    var link = document.createElement("a");
+                    if (link.download !== undefined) { // feature detection
+                        // Browsers that support HTML5 download attribute
+                        var url = URL.createObjectURL(blob);
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", exportedFilenmae);
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                };
             }
         }
+
+        //console.log(data.value);
+        var fileTitle = 'IHMexpertDATA';
+
+        (async() => {
+            const res = await getData();
+            const headers = res.headers;
+            const data = res.data;
+            exportCSVFile(headers, data, fileTitle);
+        })()
     </script>
 
 </body>

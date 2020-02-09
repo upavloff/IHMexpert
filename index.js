@@ -29,16 +29,22 @@ app.get('/api' /*getData*/ , (request, response) => {
 
 app.post('/api', (request, response) => {
     console.log('I got a request');
-    const timestamp = Date.now();
     const data = request.body;
-    data.timestamp = timestamp;
-    database.insert(data);
-    /*console.log(data);*/
+    const timestamp = Date.now();
+    data.duration = new Date(timestamp - data.initDate);
+    database.insert(data); /*console.log(data);*/
+
     /* repondre au post */
     response.json({
         status: 'success',
-        x: data.x,
-        y: data.y,
-        timestamp: timestamp
+        initDate: data.initDate,
+        ipUser: data.ipAdress,
+        // facteur : ?
+        nbTrials: data.nbTrials,
+        formNameTimeline: data.formNameTimeline,
+        errors: data.errors,
+        unlock: data.unlockState,
+        nbClick: data.nbClick,
+        duration: data.duration
     });
 });
