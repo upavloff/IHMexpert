@@ -103,7 +103,7 @@
             var blob = new Blob([csv], {
                 type: 'text/csv;charset=utf-8;'
             });
-            if (false && navigator.msSaveBlob) { // IE 10+
+            if (false && navigator.msSaveBlob) { // TODO change this line
                 navigator.msSaveBlob(blob, exportedFilenmae);
             } else {
                 var downloadButton = document.getElementById("downloadButton");
