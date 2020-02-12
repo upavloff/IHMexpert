@@ -2,7 +2,9 @@
 
 try it : https://ulrych8.github.io/IHMexpert/index.html
 ------
-do it : https://ulrych8-ihmexpert.glitch.me/index.html
+To play : https://ulrych8-ihmexpert.glitch.me/index.html
+------
+Data : https://ulrych8-ihmexpert.glitch.me/data.html
 ------
 Notre projet vise à répondre à la question "Pourquoi ne devenons nous pas des experts ?". 
 
