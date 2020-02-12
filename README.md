@@ -1,7 +1,6 @@
 # IHMexpert
 
-try it : https://ulrych8.github.io/IHMexpert/index.html
-------
+
 To play : https://ulrych8-ihmexpert.glitch.me/index.html
 ------
 Data : https://ulrych8-ihmexpert.glitch.me/data.html
@@ -17,3 +16,5 @@ Ce biais de la récompense instantanée est relativement bien couvert par la lit
 
 ----------------------
 with an empty database : https://ihmexpert.herokuapp.com/index.html  
+Old version : https://ulrych8.github.io/IHMexpert/index.html
+------
