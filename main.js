@@ -16,12 +16,14 @@ function clickCount( /* mouse event*/ event) {
 async function endGamePOSTING() {
     options.body = JSON.stringify({
         initDate: initDate,
-        ipUser: ipAdress, // adresse ip ?
+        ipUser: ipAdress,
         // facteur : ?
         nbTrials: nbTrials,
         formNameTimeline: formNameTimeline,
         errors: errors,
         unlock: nbLockLeft,
+        listNbUnusefulClick: listNbUnusefulClick, //new
+        listDuration: listDuration, //new
         nbClick: nbTotalClick
     });
     const response = await fetch('/api', options);
@@ -281,6 +283,8 @@ var errors = [];
 var nbLockLeft = []; //unlock state link to the formTimeline
 var nbTotalClick = 0;
 var nbUsefulClick = 0;
+var listNbUnusefulClick = [];
+var listDuration = [];
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 //                        set up the timeline canvas 
@@ -311,7 +315,7 @@ var ctxTimeline = canvTimeline.getContext("2d");
 //index
 var indexStep = new Indexer(getTimelineGridX(0), getTimelineGridY(), INDEX_SIZE, INDEX_SIZE);
 
-var formTimeline = []; //<-- put in game variables to post in database
+var formTimeline = [];
 
 for (let i = 0; i < STEP; i++) {
     currentForm = null;
@@ -548,12 +552,16 @@ function selectForm( /* type MouseEvent*/ event) {
 function gameUpdate() {
     //update Game Variable to save :
     nbLockLeft[currentStep] = learningState[nameCurrentForm];
+    listNbUnusefulClick.push(nbTotalClick - nbUsefulClick);
     if (nbTotalClick > nbUsefulClick) {
         errors.push(true);
         nbUsefulClick = nbTotalClick;
     } else {
         errors.push(false);
     }
+    var timestamp = Date.now();
+    listDuration.push(new Date(timestamp - start)); //start is initialise in chrono variables
+    //--------------------------------------------------
     //update Game
     start = new Date(); //useful for chrono
     formTimeline[currentStep].highlight = true;

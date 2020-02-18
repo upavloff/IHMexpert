@@ -31,7 +31,7 @@ app.post('/api', (request, response) => {
     console.log('I got a request');
     const data = request.body;
     const timestamp = Date.now();
-    data.duration = new Date(timestamp - data.initDate);
+    data.totalDuration = new Date(timestamp - data.initDate);
     database.insert(data); /*console.log(data);*/
 
     /* repondre au post */
@@ -43,7 +43,9 @@ app.post('/api', (request, response) => {
         nbTrials: data.nbTrials,
         formNameTimeline: data.formNameTimeline,
         errors: data.errors,
-        unlock: data.unlockState,
+        unlock: data.unlock,
+        listNbUnusefulClick: data.listNbUnusefulClick,
+        listDuration: data.listDuration,
         nbClick: data.nbClick,
         duration: data.duration
     });

@@ -11,10 +11,24 @@
     <h1>Data here :</h1>
     <button id="downloadButton">download CSV file</button>
     <script>
+        function dateToString(timestamp) {
+            var date = new Date(timestamp);
+            var sec = date.getSeconds();
+            var min = date.getMinutes();
+            if (min < 10) {
+                min = "0" + min;
+            }
+            if (sec < 10) {
+                sec = "0" + sec;
+            }
+            return min + ":" + sec;
+        }
+
         async function getData() {
             const response = await fetch('/api');
             const data = await response.json();
             const dataNewFormat = [];
+
             for (element of data) {
                 const root = document.createElement('p');
                 const initDate = document.createElement('div');
@@ -24,7 +38,9 @@
                 const errors = document.createElement('div');
                 const unlock = document.createElement('div');
                 const nbClick = document.createElement('div');
-                const duration = document.createElement('div');
+                const listNbUnusefulClick = document.createElement('div');
+                const listDuration = document.createElement('div');
+                const totalDuration = document.createElement('div');
 
                 const dateString = new Date(element.initDate).toLocaleString();
                 initDate.textContent = dateString;
@@ -34,11 +50,20 @@
                 errors.textContent = 'errors : ' + element.errors.toString();
                 unlock.textContent = 'unlock : ' + element.unlock.toString();
                 nbClick.textContent = 'nbClick : ' + String(element.nbClick);
-                const dateDuration = new Date(element.duration);
-                duration.textContent = "durée : " + dateDuration.getMinutes() + ":" + dateDuration.getSeconds();
+                listNbUnusefulClick.textContent = 'liste des clicks inutiles : ' + element.listNbUnusefulClick.toString();
+                listDuration.textContent = ' durées succesives : [';
+                for (date of element.listDuration) {
+                    timer = dateToString(date);
+                    listDuration.textContent += timer + ',';
+                }
+                listDuration.textContent += ']';
+                totalDuration.textContent = "durée : " + dateToString(element.totalDuration);
 
-                root.append(initDate, ipUser, nbTrials, formNameTimeline, errors, unlock, nbClick, duration);
+                root.append(initDate, ipUser, nbTrials, formNameTimeline, errors, unlock, nbClick, listNbUnusefulClick, listDuration, totalDuration);
                 document.body.append(root);
+
+                //------------------------------------------------------
+                //----  tranform data to json convertible to csv
 
                 for (i in element.formNameTimeline) {
                     dataNewFormat.push({
@@ -49,7 +74,9 @@
                         error: element.errors[i],
                         unlock: element.unlock[i],
                         nbClick: element.nbClick,
-                        duration: element.duration
+                        nbUnusefulClick: element.listNbUnusefulClick[i],
+                        duration: element.listDuration[i],
+                        totalDuration: element.totalDuration
                     });
                 }
             }
@@ -61,7 +88,9 @@
                 error: 'Error',
                 unlock: 'Unlock State',
                 nbClick: 'nb Clicks',
-                duration: 'Duration'
+                nbUnusefulClick: 'nb Unuseful Click',
+                duration: 'Duration',
+                totalDuration: 'Total Duration'
             }
             return {
                 headers: headers,
@@ -103,11 +132,11 @@
             var blob = new Blob([csv], {
                 type: 'text/csv;charset=utf-8;'
             });
-            if (false && navigator.msSaveBlob) { // IE 10+
-                navigator.msSaveBlob(blob, exportedFilenmae);
-            } else {
-                var downloadButton = document.getElementById("downloadButton");
-                downloadButton.onclick = function() {
+            var downloadButton = document.getElementById("downloadButton");
+            downloadButton.onclick = function() {
+                if (navigator.msSaveBlob) { // IE 10+
+                    navigator.msSaveOrOpenBlob(blob, exportedFilenmae);
+                } else {
                     var link = document.createElement("a");
                     if (link.download !== undefined) { // feature detection
                         // Browsers that support HTML5 download attribute
