@@ -269,7 +269,7 @@ class Button {
 //careful if changed this list has to be in the same order as the forms in the learning board
 const formsList = ["Square", "Circle", "Triangle", "Cross"];
 const learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
-const nbTrials = 3;
+const nbTrials = 4;
 const initDate = Date.now();
 var ipAdress = null;
 $.getJSON("https://api.ipify.org?format=json", function(data) {
