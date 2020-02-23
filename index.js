@@ -31,7 +31,7 @@ app.post('/api', (request, response) => {
     console.log('I got a request');
     const data = request.body;
     const timestamp = Date.now();
-    data.totalDuration = new Date(timestamp - data.initDate);
+    data.totalDuration = timestamp - new Date(data.initDate).getTime(); //new Date(timestamp - data.initDate);
     database.insert(data); /*console.log(data);*/
 
     /* repondre au post */

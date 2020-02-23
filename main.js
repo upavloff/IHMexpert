@@ -270,7 +270,7 @@ class Button {
 const formsList = ["Square", "Circle", "Triangle", "Cross"];
 const learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
 const nbTrials = 4;
-const initDate = Date.now();
+const initDate = new Date(Date.now());
 var ipAdress = null;
 $.getJSON("https://api.ipify.org?format=json", function(data) {
     ipAdress = data.ip;
@@ -560,7 +560,9 @@ function gameUpdate() {
         errors.push(false);
     }
     var timestamp = Date.now();
-    listDuration.push(new Date(timestamp - start)); //start is initialise in chrono variables
+    console.log(timestamp - start);
+    //start is initialise in chrono variables
+    listDuration.push(timestamp - start); // new Date(timestamp - start)); 
     //--------------------------------------------------
     //update Game
     start = new Date(); //useful for chrono

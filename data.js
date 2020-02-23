@@ -78,8 +78,8 @@ async function getData() {
         unlock: 'Unlock State',
         nbClick: 'nb Clicks',
         nbUnusefulClick: 'nb Unuseful Click',
-        duration: 'Duration',
-        totalDuration: 'Total Duration'
+        duration: 'Duration (ms)',
+        totalDuration: 'Total Duration (ms)'
     }
     return {
         headers: headers,
