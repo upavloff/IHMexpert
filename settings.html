@@ -8,15 +8,50 @@
     <!-- <link rel="stylesheet" href="/style.css"> -->
     <!-- import the webpage's javascript file -->
     <script src="/settings.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        h1 {
+            text-align: center;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .custom-file-upload {
+            background-color: white;
+            border: 2px solid #4CAF50;
+            border-radius: 4px;
+            color: black;
+            padding: 12px 30px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .custom-file-upload:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        #fileName {
+            padding-left: 4px;
+            display: inline-block;
+        }
+    </style>
 </head>
 
 <body>
     <h1>Settings</h1>
 
-    <p>
+    <!--<p>
         Parses CSV into JSON.
-    </p>
-    <input type="file" id="uploadButton">
+    </p>-->
+    <label class="custom-file-upload">
+        <input type="file" id="uploadButton">
+        <i class="fa fa-upload"></i> Upload CSV
+    </label>
+    <div id="fileName"></div>
     <div id="json-output" class="left"></div>
 </body>
 

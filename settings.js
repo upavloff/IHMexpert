@@ -24,10 +24,12 @@ function loadFile(event) {
 
     // make sure the file is a CSV
     if (file.type !== "text/csv") {
-        printToOutput("This app can only take CSV files!");
+        alert(file.name + " is not a CSV files")
+        printToOutput("  Choose CSV files");
         return; // stop trying to do the other stuff in this function
     }
-
+    //display file.name
+    document.getElementById("fileName").innerHTML = file.name;
     // read the file with FileReader
     const reader = new FileReader();
     reader.onload = function(e) {

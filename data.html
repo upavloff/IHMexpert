@@ -4,165 +4,68 @@
 <head>
     <meta charset="UTF-8">
     <title>IHM expert -> data</title>
-    <!-- <link rel="stylesheet" href="style.css"> -->
+    <!-- following stylesheet allows little download icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        h1 {
+            text-align: center;
+        }
+        
+        .table {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        td,
+        th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #ddd;
+        }
+        
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        #downloadButton {
+            background-color: white;
+            border: 2px solid #4CAF50;
+            border-radius: 4px;
+            color: black;
+            padding: 12px 30px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.2s ease-in-out;
+        }
+        /* Darker background on mouse-over */
+        
+        #downloadButton:hover {
+            background-color: #4CAF50;
+            color: white;
+            /*RoyalBlue;
+            box-shadow: 5px 12px 16px 0 rgba(0, 0, 0, 0.25), 0 17px 50px 0 rgba(0, 0, 0, 0.19);*/
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Data here :</h1>
-    <button id="downloadButton">download CSV file</button>
-    <script>
-        function dateToString(timestamp) {
-            var date = new Date(timestamp);
-            var sec = date.getSeconds();
-            var min = date.getMinutes();
-            if (min < 10) {
-                min = "0" + min;
-            }
-            if (sec < 10) {
-                sec = "0" + sec;
-            }
-            return min + ":" + sec;
-        }
-
-        async function getData() {
-            const response = await fetch('/api');
-            const data = await response.json();
-            const dataNewFormat = [];
-
-            for (element of data) {
-                const root = document.createElement('p');
-                const initDate = document.createElement('div');
-                const ipUser = document.createElement('div');
-                const nbTrials = document.createElement('div');
-                const formNameTimeline = document.createElement('div');
-                const errors = document.createElement('div');
-                const unlock = document.createElement('div');
-                const nbClick = document.createElement('div');
-                const listNbUnusefulClick = document.createElement('div');
-                const listDuration = document.createElement('div');
-                const totalDuration = document.createElement('div');
-
-                const dateString = new Date(element.initDate).toLocaleString();
-                initDate.textContent = dateString;
-                ipUser.textContent = 'ipUser : ' + element.ipUser;
-                nbTrials.textContent = `nbTrials : ${element.nbTrials}`;
-                formNameTimeline.textContent = 'formNameTimeline : ' + element.formNameTimeline.toString();
-                errors.textContent = 'errors : ' + element.errors.toString();
-                unlock.textContent = 'unlock : ' + element.unlock.toString();
-                nbClick.textContent = 'nbClick : ' + String(element.nbClick);
-                listNbUnusefulClick.textContent = 'liste des clicks inutiles : ' + element.listNbUnusefulClick.toString();
-                listDuration.textContent = ' durées succesives : [';
-                for (date of element.listDuration) {
-                    timer = dateToString(date);
-                    listDuration.textContent += timer + ',';
-                }
-                listDuration.textContent += ']';
-                totalDuration.textContent = "durée : " + dateToString(element.totalDuration);
-
-                root.append(initDate, ipUser, nbTrials, formNameTimeline, errors, unlock, nbClick, listNbUnusefulClick, listDuration, totalDuration);
-                document.body.append(root);
-
-                //------------------------------------------------------
-                //----  tranform data to json convertible to csv
-
-                for (i in element.formNameTimeline) {
-                    dataNewFormat.push({
-                        initDate: element.initDate,
-                        ipUser: element.ipUser,
-                        nbTrials: element.nbTrials,
-                        form: element.formNameTimeline[i],
-                        error: element.errors[i],
-                        unlock: element.unlock[i],
-                        nbClick: element.nbClick,
-                        nbUnusefulClick: element.listNbUnusefulClick[i],
-                        duration: element.listDuration[i],
-                        totalDuration: element.totalDuration
-                    });
-                }
-            }
-            const headers = {
-                initDate: 'Date',
-                ipUser: 'User IP',
-                nbTrials: 'nb Trials',
-                form: 'Form Target',
-                error: 'Error',
-                unlock: 'Unlock State',
-                nbClick: 'nb Clicks',
-                nbUnusefulClick: 'nb Unuseful Click',
-                duration: 'Duration',
-                totalDuration: 'Total Duration'
-            }
-            return {
-                headers: headers,
-                data: dataNewFormat
-            };
-        }
-        //-------------------------------------------------------------------
-        //                      export to csv part
-        //-------------------------------------------------------------------
-        function convertToCSV(objArray) {
-            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-            var str = '';
-
-            for (var i = 0; i < array.length; i++) {
-                var line = '';
-                for (var index in array[i]) {
-                    if (line != '') line += ','
-
-                    line += array[i][index];
-                }
-
-                str += line + '\r\n';
-            }
-
-            return str;
-        }
-
-        function exportCSVFile(headers, items, fileTitle) {
-            if (headers) {
-                items.unshift(headers);
-            }
-            // Convert Object to JSON
-            var jsonObject = JSON.stringify(items);
-
-            var csv = this.convertToCSV(jsonObject);
-
-            var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
-
-            var blob = new Blob([csv], {
-                type: 'text/csv;charset=utf-8;'
-            });
-            var downloadButton = document.getElementById("downloadButton");
-            downloadButton.onclick = function() {
-                if (navigator.msSaveBlob) { // IE 10+
-                    navigator.msSaveOrOpenBlob(blob, exportedFilenmae);
-                } else {
-                    var link = document.createElement("a");
-                    if (link.download !== undefined) { // feature detection
-                        // Browsers that support HTML5 download attribute
-                        var url = URL.createObjectURL(blob);
-                        link.setAttribute("href", url);
-                        link.setAttribute("download", exportedFilenmae);
-                        link.style.visibility = 'hidden';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }
-                };
-            }
-        }
-
-        //console.log(data.value);
-        var fileTitle = 'IHMexpertDATA';
-
-        (async() => {
-            const res = await getData();
-            const headers = res.headers;
-            const data = res.data;
-            exportCSVFile(headers, data, fileTitle);
-        })()
-    </script>
-
+    <h1>DATA</h1>
+    <button id="downloadButton"><i class="fa fa-download"></i> Download CSV file</button>
+    <script src="/data.js" defer></script>
+    <p></p>
+    <div id="output"></div>
 </body>
 
 </html>
