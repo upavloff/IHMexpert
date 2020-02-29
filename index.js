@@ -11,8 +11,13 @@ app.use(express.static('./'));
 //to parse incomming data as json
 app.use(express.json( /*{limit:'1mb'} */ ));
 
+//database of users informations
 const database = new Datastore('database.db');
 database.loadDatabase();
+
+//database of gameParameters
+const gameParameters = new Datastore('gameParameters.db');
+gameParameters.loadDatabase();
 
 
 app.get('/api' /*getData*/ , (request, response) => {
@@ -48,5 +53,38 @@ app.post('/api', (request, response) => {
         listDuration: data.listDuration,
         nbClick: data.nbClick,
         duration: data.duration
+    });
+});
+
+app.get('/settings' /*getData*/ , (request, response) => {
+    console.log('I got a request to send');
+
+    gameParameters.find({}, (err, data) => {
+        if (err) {
+            response.end();
+            return;
+        }
+        response.json(data);
+    });
+});
+
+app.post('/settings', (request, response) => {
+    console.log('I got a request to update settings');
+
+    const data = request.body;
+    //change database of the game parameters :
+    gameParameters.remove({}, { multi: true }, function(err, numRemoved) {
+        gameParameters.loadDatabase(function(err) {
+            // done
+        });
+    });
+    gameParameters.insert(data);
+
+    /* repondre au post */
+    response.json({
+        status: 'success',
+        nbTrials: data.nbTrials,
+        nbLocks: data.nbLocks,
+        formList: data.formList
     });
 });

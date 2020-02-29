@@ -7,6 +7,7 @@
 
     <!-- <link rel="stylesheet" href="/style.css"> -->
     <!-- import the webpage's javascript file -->
+
     <script src="/settings.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
@@ -49,6 +50,9 @@
             background: #eee;
             vertical-align: text-bottom;
         }
+        /*
+        -----------------------------------------
+        */
     </style>
 </head>
 
@@ -63,7 +67,33 @@
         <i class="fa fa-upload"></i> Upload CSV
     </label>
     <div id="fileName"></div>
+
     <div id="json-output" class="left"></div>
+
+    <form id="settingsForm" oninput="rangeOutput.value=parseInt(nbTrials.value);">
+        <p>
+            <label for="nbTrials">Nombre d'essaies :  </label>
+            <input id="nbTrials" name="nbTrials" type="range" min="5" value="10" max="50">
+            <output id="nbTrialsOutput" name="rangeOutput" value="10"></output>
+        </p>
+        <p>
+            Choix des formes :
+            <input type="checkbox" id="Square" name="Square" value="Square">Square
+            <input type="checkbox" id="Circle" name="Circle" value="Circle">Circle
+            <input type="checkbox" id="Triangle" name="Triangle" value="Triangle">Triangle
+            <input type="checkbox" id="Cross" name="Cross" value="Cross">Cross
+        </p>
+        <p>
+            <label for="nbLocks">Nombre de cadenas : </label>
+            <input id="nbLocks" name="nbLocks" type="number" min="0" max="7" value="1" required>
+        </p>
+        <p>
+            <button onclick="updateSettings()">UPDATE Settings</button>
+            <a id="indexRef" href="index.html">See changes</a>
+        </p>
+
+    </form>
+
 </body>
 
 </html>
