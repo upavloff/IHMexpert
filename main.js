@@ -72,17 +72,21 @@ function Game() {
     }
 
     async function endGamePOSTING() {
+        //timestamp for the total duration
+        const timestamp = Date.now();
+
         options.body = JSON.stringify({
             initDate: initDate,
             ipUser: ipAdress,
             // facteur : ?
-            nbTrials: nbTrials,
+            nbTrials: STEP,
             formNameTimeline: formNameTimeline,
             errors: errors,
             unlock: nbLockLeft,
             listNbUnusefulClick: listNbUnusefulClick, //new
             listDuration: listDuration, //new
-            nbClick: nbTotalClick
+            nbClick: nbTotalClick,
+            totalDuration: timestamp - new Date(initDate).getTime()
         });
         const response = await fetch('/api', options);
         const data = await response.json();

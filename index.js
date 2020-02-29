@@ -33,11 +33,11 @@ app.get('/api' /*getData*/ , (request, response) => {
 
 
 app.post('/api', (request, response) => {
-    console.log('I got a request');
+    console.log('I got a request to log data');
     const data = request.body;
-    const timestamp = Date.now();
-    data.totalDuration = timestamp - new Date(data.initDate).getTime(); //new Date(timestamp - data.initDate);
-    database.insert(data); /*console.log(data);*/
+    //new Date(timestamp - data.initDate);
+    database.insert(data);
+    console.log(data);
 
     /* repondre au post */
     response.json({
