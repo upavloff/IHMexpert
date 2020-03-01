@@ -604,7 +604,6 @@ function Game() {
             errors.push(false);
         }
         var timestamp = Date.now();
-        console.log(timestamp - start);
         //start is initialise in chrono variables
         listDuration.push(timestamp - start); // new Date(timestamp - start)); 
         //--------------------------------------------------

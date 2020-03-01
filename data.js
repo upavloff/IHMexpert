@@ -54,11 +54,12 @@ async function getData() {
         //------------------------------------------------------
         //----  tranform data to json convertible to csv
 
-        for (i in element.formNameTimeline) {
+        for (var i in element.formNameTimeline) {
             dataNewFormat.push({
                 initDate: element.initDate,
                 ipUser: element.ipUser,
-                nbTrials: element.nbTrials,
+                nbTrials: parseInt(i) + 1,
+                nbTotalTrials: element.nbTrials,
                 form: element.formNameTimeline[i],
                 error: element.errors[i],
                 unlock: element.unlock[i],
@@ -73,6 +74,7 @@ async function getData() {
         initDate: 'Date',
         ipUser: 'User IP',
         nbTrials: 'nb Trials',
+        nbTotalTrials: 'nb Total Trials',
         form: 'Form Target',
         error: 'Error',
         unlock: 'Unlock State',
