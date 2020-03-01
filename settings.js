@@ -16,15 +16,11 @@ passContainer.addEventListener('animationend', () => {
 });
 
 
-
-
 function validatePassword(password) {
     fetch('/password')
         .then(response => response.json())
         .then(pass => {
             const truePassword = pass.password;
-            console.log(password);
-            console.log(truePassword);
             if (truePassword == password) {
                 document.body.style.backgroundColor = 'white';
                 document.getElementById("after-login").style.display = "block";
