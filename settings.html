@@ -15,6 +15,8 @@
             font-family: "Helvetica", "Arial", sans-serif;
             line-height: 1.5;
             padding: 1em 1em;
+            background-color: rgb(87, 189, 130);
+            transition: all 0.2s ease-in-out;
         }
         
         h1 {
@@ -53,6 +55,54 @@
         /*
         -----------------------------------------
         */
+        
+        #after-login {
+            display: none;
+        }
+        
+        .password-form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            display: flex;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            height: 50px;
+            width: 400px;
+            align-items: center;
+            border-radius: 5px;
+        }
+        
+        .password-form i {
+            padding: 10px;
+        }
+        
+        .password-form input {
+            background: none;
+            border: none;
+            flex: 1;
+            height: 50px;
+            outline: none;
+        }
+        
+        #password-arrow {
+            cursor: pointer;
+        }
+        
+        @keyframes shake {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            30% {
+                transform: translate(-50%, -50%) rotate(5deg);
+            }
+            60% {
+                transform: translate(-50%, -50%) rotate(-5deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+        }
     </style>
 </head>
 
@@ -62,37 +112,50 @@
     <!--<p>
         Parses CSV into JSON.
     </p>-->
-    <label class="custom-file-upload">
+    <div id="pass" class="password-form">
+        <div class="field-password">
+            <i class="fa fa-key"></i>
+            <input id="input-password" type="password" placeholder="Password" size="45" required>
+            <i id="password-arrow" class="fa fa-arrow-right"></i>
+        </div>
+    </div>
+
+    <div id="after-login">
+        <label class="custom-file-upload">
         <input type="file" id="uploadButton">
         <i class="fa fa-upload"></i> Upload CSV
     </label>
-    <div id="fileName"></div>
+        <div id="fileName"></div>
 
-    <div id="json-output" class="left"></div>
+        <div id="json-output" class="left"></div>
 
-    <form id="settingsForm" oninput="rangeOutput.value=parseInt(nbTrials.value);">
-        <p>
-            <label for="nbTrials">Nombre d'essaies :  </label>
-            <input id="nbTrials" name="nbTrials" type="range" min="5" value="10" max="50">
-            <output id="nbTrialsOutput" name="rangeOutput" value="10"></output>
-        </p>
-        <p>
-            Choix des formes :
-            <input type="checkbox" id="Square" name="Square" value="Square">Square
-            <input type="checkbox" id="Circle" name="Circle" value="Circle">Circle
-            <input type="checkbox" id="Triangle" name="Triangle" value="Triangle">Triangle
-            <input type="checkbox" id="Cross" name="Cross" value="Cross">Cross
-        </p>
-        <p>
-            <label for="nbLocks">Nombre de cadenas : </label>
-            <input id="nbLocks" name="nbLocks" type="number" min="0" max="7" value="1" required>
-        </p>
-        <p>
-            <button onclick="updateSettings()">UPDATE Settings</button>
-            <a id="indexRef" href="index.html">See changes</a>
-        </p>
 
-    </form>
+
+        <form id="settingsForm" action="#" onsubmit="" oninput="rangeOutput.value=parseInt(nbTrials.value);">
+            <p>
+                <label for="nbTrials">Nombre d'essaies :  </label>
+                <input id="nbTrials" name="nbTrials" type="range" min="5" value="10" max="50">
+                <output id="nbTrialsOutput" name="rangeOutput" value="10"></output>
+            </p>
+            <p>
+                Choix des formes :
+                <input type="checkbox" id="Square" name="Square" value="Square">Square
+                <input type="checkbox" id="Circle" name="Circle" value="Circle">Circle
+                <input type="checkbox" id="Triangle" name="Triangle" value="Triangle">Triangle
+                <input type="checkbox" id="Cross" name="Cross" value="Cross">Cross
+            </p>
+            <p>
+                <label for="nbLocks">Nombre de cadenas : </label>
+                <input id="nbLocks" name="nbLocks" type="number" min="0" max="7" value="1" required>
+            </p>
+
+            <p>
+                <button onclick="updateSettings()">UPDATE Settings</button>
+                <a id="indexRef" href="index.html">See changes</a>
+            </p>
+        </form>
+
+    </div>
 
 </body>
 

@@ -1,3 +1,45 @@
+const inputPassword = document.getElementById("input-password");
+inputPassword.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        validatePassword(inputPassword.value);
+    }
+});
+
+const arrow = document.getElementById("password-arrow");
+arrow.addEventListener('click', () => {
+    validatePassword(inputPassword.value);
+});
+
+const passContainer = document.getElementById("pass");
+passContainer.addEventListener('animationend', () => {
+    passContainer.style.animation = "";
+});
+
+
+
+
+function validatePassword(password) {
+    fetch('/password')
+        .then(response => response.json())
+        .then(pass => {
+            const truePassword = pass.password;
+            console.log(password);
+            console.log(truePassword);
+            if (truePassword == password) {
+                document.body.style.backgroundColor = 'white';
+                document.getElementById("after-login").style.display = "block";
+                passContainer.style.display = "none";
+            } else {
+                document.body.style.backgroundColor = 'rgb(189,87,87)';
+                passContainer.style.animation = "shake 0.5s ease";
+            }
+        })
+        .catch(err => {
+            console.log("erreur dans la recherhe de password");
+            console.log(err);
+        })
+}
+
 function updateSee() {
     fetch('/settings')
         .then(response => response.json())
@@ -44,7 +86,6 @@ async function updateSettings() {
         form.required = false;
         form.setCustomValidity("");
     }
-    console.log(cptFormCecked);
     if (cptFormCecked < 2) {
         for (form of forms) {
             if (!form.checked) {
@@ -60,8 +101,6 @@ async function updateSettings() {
     const nbLocks = document.getElementById("nbLocks").value;
     var formList = [];
     for (var form of forms) {
-        console.log(form);
-        console.log("yp");
         if (form.checked) {
             formList.push(form.id);
         }

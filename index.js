@@ -1,7 +1,7 @@
 const express = require('express');
 const Datastore = require('nedb');
 require('dotenv').config;
-const cors = require('cors')
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`listening at ${port}...`));
@@ -86,5 +86,12 @@ app.post('/settings', (request, response) => {
         nbTrials: data.nbTrials,
         nbLocks: data.nbLocks,
         formList: data.formList
+    });
+});
+
+app.get('/password' /*getData*/ , (request, response) => {
+    response.json({
+        status: 'success',
+        password: 'gilles'
     });
 });
