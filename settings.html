@@ -131,7 +131,7 @@
 
 
 
-        <form id="settingsForm" action="#" onsubmit="" oninput="rangeOutput.value=parseInt(nbTrials.value);">
+        <form id="settingsForm" action="#" onsubmit="return false;" oninput="rangeOutput.value=parseInt(nbTrials.value);">
             <p>
                 <label for="nbTrials">Nombre d'essaies :  </label>
                 <input id="nbTrials" name="nbTrials" type="range" min="5" value="10" max="50">
@@ -150,7 +150,7 @@
             </p>
 
             <p>
-                <button onclick="updateSettings()">UPDATE Settings</button>
+                <button onclick="updateSettings()" style="cursor: pointer;">UPDATE Settings</button>
                 <a id="indexRef" href="index.html">See changes</a>
             </p>
         </form>
