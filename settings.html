@@ -10,100 +10,7 @@
 
     <script src="/settings.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        body {
-            font-family: "Helvetica", "Arial", sans-serif;
-            line-height: 1.5;
-            padding: 1em 1em;
-            background-color: rgb(87, 189, 130);
-            transition: all 0.2s ease-in-out;
-        }
-        
-        h1 {
-            text-align: center;
-        }
-        
-        input[type="file"] {
-            display: none;
-        }
-        
-        .custom-file-upload {
-            background-color: white;
-            border: 2px solid #4CAF50;
-            border-radius: 4px;
-            color: black;
-            padding: 12px 30px;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.2s ease-in-out;
-        }
-        
-        .custom-file-upload:hover {
-            background-color: #4CAF50;
-            color: white;
-        }
-        
-        #fileName {
-            padding-left: 4px;
-            display: inline-block;
-        }
-        
-        #json-output {
-            background: #eee;
-            vertical-align: text-bottom;
-        }
-        /*
-        -----------------------------------------
-        */
-        
-        #after-login {
-            display: none;
-        }
-        
-        .password-form {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            display: flex;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            height: 50px;
-            width: 400px;
-            align-items: center;
-            border-radius: 5px;
-        }
-        
-        .password-form i {
-            padding: 10px;
-        }
-        
-        .password-form input {
-            background: none;
-            border: none;
-            flex: 1;
-            height: 50px;
-            outline: none;
-        }
-        
-        #password-arrow {
-            cursor: pointer;
-        }
-        
-        @keyframes shake {
-            0% {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-            30% {
-                transform: translate(-50%, -50%) rotate(5deg);
-            }
-            60% {
-                transform: translate(-50%, -50%) rotate(-5deg);
-            }
-            100% {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="settings.css">
 </head>
 
 <body>
@@ -115,44 +22,63 @@
     <div id="pass" class="password-form">
         <div class="field-password">
             <i class="fa fa-key"></i>
-            <input id="input-password" type="password" placeholder="Password" size="45" required>
+            <input id="input-password" type="password" placeholder="Password" required>
             <i id="password-arrow" class="fa fa-arrow-right"></i>
         </div>
     </div>
 
     <div id="after-login">
+
+        <!--</label>
         <label class="custom-file-upload">
         <input type="file" id="uploadButton">
         <i class="fa fa-upload"></i> Upload CSV
-    </label>
         <div id="fileName"></div>
 
         <div id="json-output" class="left"></div>
+        -->
 
 
-
-        <form id="settingsForm" action="#" onsubmit="return false;" oninput="rangeOutput.value=parseInt(nbTrials.value);">
+        <form id="settingsForm" action="#" onsubmit="return false;">
+            <!--oninput="rangeOutput.value=parseInt(nbTrials.value);"-->
             <p>
-                <label for="nbTrials">Nombre d'essaies :  </label>
+                <label for="nbBlocksToDo">Nombre total de Blocks à faire : </label>
+                <input id="nbBlocksToDo" name="nbBlocksToDo" type="number" min="2" max="10" value="2" required>
+            </p>
+            <p>
+                <label for="nbTrialsByBlock">Nombre d'éssais par Blocks : </label>
+                <input id="nbTrialsByBlock" name="nbTrialsByBlock" type="number" min="2" max="10" value="2" required>
+            </p>
+            <p>
+                Ajout d'un block <button id="addBlocker" onclick="addBlock()" style="cursor: pointer;"><i id="iconPlus" class="fa fa-plus"></i></button>
+                <div id="listBlock"></div>
+            </p>
+            <!-- <p>
+                <label for="nbTrials">Nombre d'essais :  </label>
                 <input id="nbTrials" name="nbTrials" type="range" min="5" value="10" max="50">
                 <output id="nbTrialsOutput" name="rangeOutput" value="10"></output>
-            </p>
-            <p>
-                Choix des formes :
-                <input type="checkbox" id="Square" name="Square" value="Square">Square
-                <input type="checkbox" id="Circle" name="Circle" value="Circle">Circle
-                <input type="checkbox" id="Triangle" name="Triangle" value="Triangle">Triangle
-                <input type="checkbox" id="Cross" name="Cross" value="Cross">Cross
-            </p>
+            </p> -->
+
             <p>
                 <label for="nbLocks">Nombre de cadenas : </label>
                 <input id="nbLocks" name="nbLocks" type="number" min="0" max="7" value="1" required>
             </p>
-
+            <p>
+                Easy mode :
+                <input type="radio" id="easyModeTrue" name="easyMode" value="true">True
+                <input type="radio" id="easyModeFalse" name="easyMode" value="false">False
+            </p>
+            <p>
+                Display Timeline :
+                <input type="radio" id="displayTimeline" name="displayTimeline" value="true">True
+                <input type="radio" id="notDisplayTimeline" name="displayTimeline" value="false">False
+            </p>
             <p>
                 <button onclick="updateSettings()" style="cursor: pointer;">UPDATE Settings</button>
                 <a id="indexRef" href="index.html">See changes</a>
             </p>
+
+
         </form>
 
     </div>

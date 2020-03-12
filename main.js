@@ -1,9 +1,14 @@
 //-----------------------------------------------------------------------------------
 //                            GAME PARAMETERS
 //-----------------------------------------------------------------------------------
-var STEP = 5;
+var STEP = 8;
 var NB_LOCKS = 3;
-var formsList = ["Square", "Circle", "Triangle", "Cross"];
+var formsList = ["Square", "Circle"];
+var nbBlocksToDo = 2;
+var nbTrialsByBlock = 4;
+var blockList = [{ 'Square': 2, 'Circle': 2 }];
+var easyMode = true;
+var displayTimeline = true;
 
 const learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
 const initDate = new Date(Date.now());
@@ -13,27 +18,30 @@ $.getJSON("https://api.ipify.org?format=json", function(data) {
 });
 
 //LAUNCH GAME
-(async() => {
-    const gameParameters = await setGameParameters();
-    STEP = await gameParameters.nbTrials;
-    NB_LOCKS = await gameParameters.nbLocks;
-    formsList = await gameParameters.formList;
-    //-----------------------------------------
-})().then(() => {
-    console.log(formsList);
-    Game();
-})
+setGameParameters();
 
 async function setGameParameters() {
-    const response = await fetch('/settings');
-    const data = await response.json(); //should only be a list of one element
-    const params = data[0];
-    console.log(params);
-    return {
-        nbTrials: params.nbTrials,
-        nbLocks: params.nbLocks,
-        formList: params.formList
-    }
+    fetch('/settings')
+        .then(response => response.json())
+        .then(data => {
+            const gameParameters = data[0];
+            console.log(gameParameters);
+            nbTrialsByBlock = gameParameters.nbTrialsByBlock;
+            nbBlocksToDo = gameParameters.nbBlocksToDo;
+            blockList = gameParameters.blockList;
+            STEP = nbTrialsByBlock * nbBlocksToDo;
+            NB_LOCKS = gameParameters.nbLocks;
+            formsList = gameParameters.formList;
+            easyMode = gameParameters.easyMode;
+            displayTimeline = gameParameters.displayTimeline;
+        })
+        .catch(err => {
+            console.log("erreur dans la mise en place des parametres");
+            console.log(err);
+        })
+        .then(() => {
+            Game();
+        })
 }
 
 //--------------------------------------------------------------------------------
@@ -135,6 +143,10 @@ function Game() {
         constructor(x, y, w, h, thickness, selectable, context = ctxFormsBoard) {
             this.w = w;
             this.h = h;
+            this.bottom = y + h / 2; //
+            this.top = y - h / 2; //      this part was added
+            this.right = x + w / 2; //      for the easy mode
+            this.left = x - w / 2; //
             this.thickness = thickness
             this.rect1x = x - thickness / 2;
             this.rect1y = y - h / 2;
@@ -164,11 +176,16 @@ function Game() {
         }
 
         contains(x, y) {
-            //method wich return true if (x,y) inside of the cross
-            return x > this.rect1x && x < this.rect1x + this.thickness &&
-                y > this.rect1y && y < this.rect1y + this.h ||
-                x > this.rect2x && x < this.rect2x + this.w &&
-                y > this.rect2y && y < this.rect2y + this.thickness;
+            if (easyMode) {
+                return x > this.left && x < this.right && y > this.top && y < this.bottom;
+            } else {
+                //method wich return true if (x,y) inside of the cross
+                return x > this.rect1x && x < this.rect1x + this.thickness &&
+                    y > this.rect1y && y < this.rect1y + this.h ||
+                    x > this.rect2x && x < this.rect2x + this.w &&
+                    y > this.rect2y && y < this.rect2y + this.thickness;
+            }
+
         }
     }
 
@@ -177,6 +194,10 @@ function Game() {
             this.x = x;
             this.y = y;
             this.radius = radius;
+            this.bottom = y + radius; //
+            this.top = y - radius; //      this part was added
+            this.right = x + radius; //      for the easy mode
+            this.left = x - radius; //
             this.highlight = false;
             this.selectable = selectable;
             this.selected = false;
@@ -202,7 +223,11 @@ function Game() {
         }
 
         contains(x, y) {
-            return Math.abs(x - this.x) < this.radius && Math.abs(this.y - y) < this.radius;
+            if (easyMode) {
+                return x > this.left && x < this.right && y > this.top && y < this.bottom;
+            } else {
+                return Math.abs(x - this.x) < this.radius && Math.abs(this.y - y) < this.radius;
+            }
         }
     }
 
@@ -211,6 +236,10 @@ function Game() {
             this.x = x;
             this.y = y;
             this.h = h;
+            this.bottom = y + h / 2; //
+            this.top = y - h / 2; //      this part was added
+            this.right = x + h / 2; //      for the easy mode
+            this.left = x - h / 2; //
             this.highlight = false;
             this.selectable = selectable;
             this.selected = false;
@@ -257,10 +286,15 @@ function Game() {
         }
 
         contains(x, y) {
-            return x >= this.t1.x && x < this.t3.x &&
-                y > this.slope_t1_t2(x) && y > this.slope_t2_t3(x) &&
-                y <= this.t3.y;
+            if (easyMode) {
+                return x > this.left && x < this.right && y > this.top && y < this.bottom;
+            } else {
+                return x >= this.t1.x && x < this.t3.x &&
+                    y > this.slope_t1_t2(x) && y > this.slope_t2_t3(x) &&
+                    y <= this.t3.y;
+            }
         }
+
     }
 
     class Indexer {
@@ -358,28 +392,38 @@ function Game() {
 
     var formTimeline = [];
 
-    for (let i = 0; i < STEP; i++) {
-        currentForm = null;
-        switch (formsList[Math.floor(Math.random() * formsList.length)]) {
-            case "Square":
-                currentForm = new Square(getTimelineGridX(i), getTimelineGridY(), MIN_SQUARE_SIZE, MIN_SQUARE_SIZE, false, ctxTimeline);
-                break;
-            case "Circle":
-                currentForm = new Circle(getTimelineGridX(i), getTimelineGridY(), MIN_CIRCLE_RADIUS, false, ctxTimeline);
-                break;
-            case "Triangle":
-                currentForm = new Triangle(getTimelineGridX(i), getTimelineGridY(), MIN_TRIANGLE_HEIGHT, false, ctxTimeline);
-                break;
-            case "Cross":
-                currentForm = new Cross(getTimelineGridX(i), getTimelineGridY(), MIN_SQUARE_SIZE, MIN_SQUARE_SIZE, MIN_CROSS_THICKNESS, false, ctxTimeline);
-                break;
-            default:
-                console.log("Error while selecting forms for the timeline");
-                break;
-        }
+    for (let i = 0; i < nbBlocksToDo; i++) {
+        var formToAdd = JSON.parse(JSON.stringify(blockList[i % blockList.length]));
 
-        formTimeline[i] = currentForm;
+        for (let j = 0; j < nbTrialsByBlock; j++) {
+            var currentIndex = i * nbTrialsByBlock + j;
+            var currentForm = null;
+            var tempFormSelected = Object.keys(formToAdd)[Math.floor(Math.random() * Object.keys(formToAdd).length)]
+            formToAdd[tempFormSelected] -= 1;
+            if (formToAdd[tempFormSelected] == 0) {
+                delete formToAdd[tempFormSelected];
+            }
+            switch (tempFormSelected) {
+                case "Square":
+                    currentForm = new Square(getTimelineGridX(currentIndex), getTimelineGridY(), MIN_SQUARE_SIZE, MIN_SQUARE_SIZE, false, ctxTimeline);
+                    break;
+                case "Circle":
+                    currentForm = new Circle(getTimelineGridX(currentIndex), getTimelineGridY(), MIN_CIRCLE_RADIUS, false, ctxTimeline);
+                    break;
+                case "Triangle":
+                    currentForm = new Triangle(getTimelineGridX(currentIndex), getTimelineGridY(), MIN_TRIANGLE_HEIGHT, false, ctxTimeline);
+                    break;
+                case "Cross":
+                    currentForm = new Cross(getTimelineGridX(currentIndex), getTimelineGridY(), MIN_SQUARE_SIZE, MIN_SQUARE_SIZE, MIN_CROSS_THICKNESS, false, ctxTimeline);
+                    break;
+                default:
+                    console.log("Error while selecting forms for the timeline");
+                    break;
+            }
+            formTimeline[currentIndex] = currentForm;
+        }
     }
+
 
     var nameCurrentForm = formTimeline[0].constructor.name;
 
@@ -404,10 +448,12 @@ function Game() {
         ctxTimeline.fillStyle = COLOR_FONT;
         ctxTimeline.font = "bold 18px arial";
         ctxTimeline.fillText("Step " + (currentStep + 1) + "/" + STEP, 2, 23);
-        for (let form of formTimeline) {
-            form.draw();
+        if (displayTimeline) {
+            for (let form of formTimeline) {
+                form.draw();
+            }
+            indexStep.draw();
         }
-        indexStep.draw();
     }
 
     function drawTimelineBoard() {
@@ -616,6 +662,8 @@ function Game() {
         if (currentStep >= STEP) {
             console.log("END OF THE GAME");
             endGamePOSTING(); //post infos of the game
+            document.getElementById("endGame").style.display = "flex";
+            document.getElementById("scoreValue").innerHTML = currentScore;
             return;
         }
         nameCurrentForm = formTimeline[currentStep].constructor.name;
@@ -911,6 +959,7 @@ function Game() {
         if (nbCurrentFormSelected >= nbFormToSelect) {
             nbUsefulClick++;
             gameUpdate();
+
         }
     }
 

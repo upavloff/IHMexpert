@@ -57,13 +57,14 @@ app.post('/api', (request, response) => {
 });
 
 app.get('/settings' /*getData*/ , (request, response) => {
-    console.log('I got a request to send');
+    console.log('I got a request to send game parameters');
 
     gameParameters.find({}, (err, data) => {
         if (err) {
             response.end();
             return;
         }
+        console.log(data);
         response.json(data);
     });
 });
@@ -83,9 +84,13 @@ app.post('/settings', (request, response) => {
     /* repondre au post */
     response.json({
         status: 'success',
-        nbTrials: data.nbTrials,
+        nbBlocksToDo: data.nbBlocksToDo,
         nbLocks: data.nbLocks,
-        formList: data.formList
+        blockList: data.blockList,
+        nbTrialsByBlock: data.nbTrialsByBlock,
+        formList: data.formList,
+        easyMode: data.easyMode,
+        displayTimeline: data.displayTimeline
     });
 });
 
