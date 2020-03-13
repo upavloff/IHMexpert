@@ -781,16 +781,84 @@ function Game() {
         let x = event.clientX - targetCanvasBoundings.left;
         let y = event.clientY - targetCanvasBoundings.top;
         if (unlockButton.contains(x, y) && nbCurrentFormSelected >= nbFormToSelect) {
-            //next if is to test if learning state can improve
-            if (learningState[nameCurrentForm] <= NB_LOCKS && unlockable) {
-                learningState[nameCurrentForm] += 1;
-                unlockable = false;
-                nbUsefulClick++;
-                if (learningState[nameCurrentForm] == NB_LOCKS) {
-                    learningState[nameCurrentForm] = "unlocked";
+
+            sliderDisplay();
+
+        }
+    }
+
+    function sliderDisplay() {
+        const slider = document.createElement('input');
+        slider.id = 'slider';
+        slider.type = 'range'
+        slider.style.top = String(TL_HEIGHT + SC_HEIGHT + 2 * TC_TOP_MARGIN + TC_HEIGHT) + "px";
+        slider.style.left = String(WIDTH + STROKE) + "px";
+        slider.style.position = 'absolute';
+        slider.style.width = String(TC_WIDTH - STROKE) + "px";
+        slider.onclick = function() { nbUsefulClick++ };
+        slider.onmouseover = function() { this.style.cursor = 'grab' };
+        slider.onmousedown = function() { this.style.cursor = 'grabbing' };
+        slider.onmouseup = function() { this.style.cursor = 'grab' };
+        var color;
+        switch (nameCurrentForm) {
+            case 'Square':
+                color = COLOR_SQUARE;
+                break;
+            case 'Circle':
+                color = COLOR_CIRCLE;
+                break;
+            case 'Triangle':
+                color = COLOR_TRIANGLE;
+                break;
+            case 'Cross':
+                color = COLOR_CROSS;
+                break;
+        }
+        slider.style.background = color;
+        var nbSlide = 0;
+        var oldValue = 0;
+        var slideDirection = 'right';
+        slider.oninput = (slider = this) => {
+            //console.log(slider['target'].value);
+            var newValue = parseInt(slider['target'].value);
+            if (slideDirection == 'right') {
+                if (newValue >= oldValue) {
+                    oldValue = newValue;
+                } else {
+                    oldValue = newValue;
+                    slideDirection = 'left';
+                    nbSlide++;
+                }
+            } else {
+                if (newValue <= oldValue) {
+                    oldValue = newValue;
+                } else {
+                    oldValue = newValue;
+                    slideDirection = 'right';
+                    nbSlide++;
+                }
+            }
+
+            //unclock part
+            if (nbSlide > 4) { //TODO change 4 in cst
+                //next if is to test if learning state can improve
+
+                if (learningState[nameCurrentForm] <= NB_LOCKS && unlockable) {
+                    learningState[nameCurrentForm] += 1;
+                    unlockable = false;
+                    nbUsefulClick++;
+                    if (learningState[nameCurrentForm] == NB_LOCKS) {
+                        learningState[nameCurrentForm] = "unlocked";
+                    }
+                    killSlider()
                 }
             }
         }
+        document.body.appendChild(slider);
+    }
+
+    function killSlider() {
+        document.getElementById('slider').remove();
     }
 
     function drawTarget() {
@@ -956,10 +1024,16 @@ function Game() {
 
     //--------------------    function   -------------------------------------------
     button.onclick = function() {
+
         if (nbCurrentFormSelected >= nbFormToSelect) {
             nbUsefulClick++;
             gameUpdate();
-
+            try {
+                killSlider();
+                console.log('passage next level sans slider');
+            } catch {
+                console.log('no unlock tried');
+            }
         }
     }
 
