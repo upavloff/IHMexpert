@@ -18,5 +18,5 @@ Ce biais de la récompense instantanée est relativement bien couvert par la lit
 with an empty database : https://ihmexpert.herokuapp.com/index.html  
 
 
-Old version : https://ulrych8.github.io/IHMexpert/index.html
+Static version : https://ulrych8.github.io/IHMexpert/index.html
 ------
