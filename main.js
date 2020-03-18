@@ -664,6 +664,9 @@ function Game() {
             endGamePOSTING(); //post infos of the game
             document.getElementById("endGame").style.display = "flex";
             document.getElementById("scoreValue").innerHTML = currentScore;
+            $.getScript('confetti.js', function() {
+                BeginConfetti();
+            });
             return;
         }
         nameCurrentForm = formTimeline[currentStep].constructor.name;
