@@ -5,7 +5,7 @@ var STEP = 8;
 var NB_LOCKS = 3;
 var formsList = ["Square", "Circle"];
 var nbBlocksToDo = 2;
-var nbTrialsByBlock = 4;
+var nbFiguresByBlock = 4;
 var blockList = [{ 'Square': 2, 'Circle': 2 }];
 var easyMode = true;
 var displayTimeline = true;
@@ -26,10 +26,10 @@ async function setGameParameters() {
         .then(data => {
             const gameParameters = data[0];
             console.log(gameParameters);
-            nbTrialsByBlock = gameParameters.nbTrialsByBlock;
+            nbFiguresByBlock = gameParameters.nbFiguresByBlock;
             nbBlocksToDo = gameParameters.nbBlocksToDo;
             blockList = gameParameters.blockList;
-            STEP = nbTrialsByBlock * nbBlocksToDo;
+            STEP = nbFiguresByBlock * nbBlocksToDo;
             NB_LOCKS = gameParameters.nbLocks;
             formsList = gameParameters.formList;
             easyMode = gameParameters.easyMode;
@@ -395,8 +395,8 @@ function Game() {
     for (let i = 0; i < nbBlocksToDo; i++) {
         var formToAdd = JSON.parse(JSON.stringify(blockList[i % blockList.length]));
 
-        for (let j = 0; j < nbTrialsByBlock; j++) {
-            var currentIndex = i * nbTrialsByBlock + j;
+        for (let j = 0; j < nbFiguresByBlock; j++) {
+            var currentIndex = i * nbFiguresByBlock + j;
             var currentForm = null;
             var tempFormSelected = Object.keys(formToAdd)[Math.floor(Math.random() * Object.keys(formToAdd).length)]
             formToAdd[tempFormSelected] -= 1;
@@ -632,6 +632,9 @@ function Game() {
                 if (form.contains(x, y) && form.selectable && !form.selected) {
                     form.selected = true; //create this attribute !
                     nbCurrentFormSelected++;
+                    if (nbCurrentFormSelected >= nbFormToSelect) {
+                        document.getElementById("nextButton").disabled = false;
+                    }
                     nbUsefulClick++;
                     break OUTER; //if one form is to highlight no need to look further
                 }
@@ -676,6 +679,9 @@ function Game() {
         formsBoard = boardInfos.formsBoard;
         nbFormToSelect = boardInfos.nbFormToSelect;
         nbCurrentFormSelected = 0;
+        if (learningState[nameCurrentForm] != 'unlocked') {
+            nextButton.disabled = true;
+        }
     }
 
     //------------------------------------------------------------------------------
@@ -783,14 +789,17 @@ function Game() {
         //get mouse position relative to the canvas
         let x = event.clientX - targetCanvasBoundings.left;
         let y = event.clientY - targetCanvasBoundings.top;
-        if (unlockButton.contains(x, y) && nbCurrentFormSelected >= nbFormToSelect) {
-
+        if (unlockButton.contains(x, y) && nbCurrentFormSelected >= nbFormToSelect && learningState[nameCurrentForm] != 'unlocked') {
             sliderDisplay();
-
         }
     }
 
     function sliderDisplay() {
+        if (!unlockable) {
+            return;
+        } else {
+            unlockable = false;
+        }
         const slider = document.createElement('input');
         slider.id = 'slider';
         slider.type = 'range'
@@ -822,7 +831,6 @@ function Game() {
         var oldValue = 0;
         var slideDirection = 'right';
         slider.oninput = (slider = this) => {
-            //console.log(slider['target'].value);
             var newValue = parseInt(slider['target'].value);
             if (slideDirection == 'right') {
                 if (newValue >= oldValue) {
@@ -846,7 +854,7 @@ function Game() {
             if (nbSlide > 4) { //TODO change 4 in cst
                 //next if is to test if learning state can improve
 
-                if (learningState[nameCurrentForm] <= NB_LOCKS && unlockable) {
+                if (learningState[nameCurrentForm] <= NB_LOCKS) {
                     learningState[nameCurrentForm] += 1;
                     unlockable = false;
                     nbUsefulClick++;
@@ -1020,20 +1028,20 @@ function Game() {
     //                              Button
     //------------------------------------------------------------------------------
 
-    var button = document.getElementById("nextButton");
-    //find a better way to choose the position of the button
-    button.style.top = String(TL_HEIGHT + HEIGHT - button.height) + "px;";
-    button.style.margin = String(WIDTH + STROKE) + "px";
+    var nextButton = document.getElementById("nextButton");
+    //find a better way to choose the position of the nextButton
+    nextButton.style.top = String(TL_HEIGHT + HEIGHT - nextButton.height) + "px;";
+    nextButton.style.margin = String(WIDTH + STROKE) + "px";
+    nextButton.disabled = true;
 
     //--------------------    function   -------------------------------------------
-    button.onclick = function() {
+    nextButton.onclick = function() {
 
         if (nbCurrentFormSelected >= nbFormToSelect) {
             nbUsefulClick++;
             gameUpdate();
             try {
                 killSlider();
-                console.log('passage next level sans slider');
             } catch {
                 console.log('no unlock tried');
             }

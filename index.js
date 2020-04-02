@@ -87,7 +87,7 @@ app.post('/settings', (request, response) => {
         nbBlocksToDo: data.nbBlocksToDo,
         nbLocks: data.nbLocks,
         blockList: data.blockList,
-        nbTrialsByBlock: data.nbTrialsByBlock,
+        nbFiguresByBlock: data.nbFiguresByBlock,
         formList: data.formList,
         easyMode: data.easyMode,
         displayTimeline: data.displayTimeline

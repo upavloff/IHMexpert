@@ -43,7 +43,7 @@ function updateSee() {
         .then(data => {
             const gameParameters = data[0];
             console.log(gameParameters);
-            document.getElementById("nbTrialsByBlock").value = gameParameters.nbTrialsByBlock;
+            document.getElementById("nbFiguresByBlock").value = gameParameters.nbFiguresByBlock;
             document.getElementById("nbBlocksToDo").value = gameParameters.nbBlocksToDo;
             //document.getElementById("nbTrialsOutput").innerHTML = gameParameters.nbTrials;
             addBlock(gameParameters.blockList);
@@ -102,7 +102,7 @@ function addBlock(blocks = [{}]) {
         //choice para
         const formChoice = document.createElement('p');
         formChoice.className = "figureChoice";
-        formChoice.innerHTML += "Choix des formes : "; //<input type = \"checkbox\" id = \"Square\" name = \"Square\" value = \"Square\" > Square <input type = \"checkbox\" id = \"Circle\" name = \"Circle\" value = \"Circle\" > Circle <input type = \"checkbox\" id = \"Triangle\" name = \"Triangle\" value = \"Triangle\" > Triangle <input type = \"checkbox\" id = \"Cross\" name = \"Cross\" value = \"Cross\" > Cross ";
+        formChoice.innerHTML += "Choose figures : "; //<input type = \"checkbox\" id = \"Square\" name = \"Square\" value = \"Square\" > Square <input type = \"checkbox\" id = \"Circle\" name = \"Circle\" value = \"Circle\" > Circle <input type = \"checkbox\" id = \"Triangle\" name = \"Triangle\" value = \"Triangle\" > Triangle <input type = \"checkbox\" id = \"Cross\" name = \"Cross\" value = \"Cross\" > Cross ";
         for (form of["Square", "Circle", "Triangle", "Cross"]) {
             const formDiv = document.createElement('div');
             const input = document.createElement('input')
@@ -207,7 +207,7 @@ const forms = [
 ]
 
 async function updateSettings() {
-    const nbTrialsByBlock = document.getElementById("nbTrialsByBlock").value;
+    const nbFiguresByBlock = document.getElementById("nbFiguresByBlock").value;
     const nbBlocksToDo = document.getElementById("nbBlocksToDo").value;
     const nbLocks = document.getElementById("nbLocks").value;
     const figureChoiceBlocks = document.querySelectorAll(".figureChoice");
@@ -230,8 +230,8 @@ async function updateSettings() {
                 if (choiceBlock == input.parentElement.parentElement) {
                     sumInputs += parseInt(input.value);
                     persistantInput = input;
-                    if (sumInputs > nbTrialsByBlock) {
-                        console.log('nbTrialsByBlock is ' + nbTrialsByBlock);
+                    if (sumInputs > nbFiguresByBlock) {
+                        console.log('nbFiguresByBlock is ' + nbFiguresByBlock);
                         console.log("sumInputs is", sumInputs);
                         input.setCustomValidity("le nombre de forme doit etre égale au nombre d'essais dans chaque block");
                         erreur = true;
@@ -248,7 +248,7 @@ async function updateSettings() {
             blockList.splice(indexBlock, 1);
             erreur = true;
             return;
-        } else if (sumInputs != nbTrialsByBlock) {
+        } else if (sumInputs != nbFiguresByBlock) {
             persistantInput.setCustomValidity("le nombre de forme doit etre égale au nombre d'essais dans chaque block");
             erreur = true;
             return;
@@ -270,7 +270,7 @@ async function updateSettings() {
 
     gameSettings.body = JSON.stringify({
         nbBlocksToDo: nbBlocksToDo,
-        nbTrialsByBlock: nbTrialsByBlock,
+        nbFiguresByBlock: nbFiguresByBlock,
         blockList: blockList,
         nbLocks: nbLocks,
         formList: formList,

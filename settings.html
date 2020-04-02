@@ -42,15 +42,15 @@
         <form id="settingsForm" action="#" onsubmit="return false;">
             <!--oninput="rangeOutput.value=parseInt(nbTrials.value);"-->
             <p>
-                <label for="nbBlocksToDo">Nombre total de Blocks à faire : </label>
+                <label for="nbBlocksToDo">Number of Blocks to do : </label>
                 <input id="nbBlocksToDo" name="nbBlocksToDo" type="number" min="2" max="10" value="2" required>
             </p>
             <p>
-                <label for="nbTrialsByBlock">Nombre d'éssais par Blocks : </label>
-                <input id="nbTrialsByBlock" name="nbTrialsByBlock" type="number" min="2" max="10" value="2" required>
+                <label for="nbFiguresByBlock">Number of figures by Blocks : </label>
+                <input id="nbFiguresByBlock" name="nbFiguresByBlock" type="number" min="2" max="10" value="2" required>
             </p>
             <p>
-                Ajout d'un block <button id="addBlocker" onclick="addBlock()" style="cursor: pointer;"><i id="iconPlus" class="fa fa-plus"></i></button>
+                Add block <button id="addBlocker" onclick="addBlock()" style="cursor: pointer;"><i id="iconPlus" class="fa fa-plus"></i></button>
                 <div id="listBlock"></div>
             </p>
             <!-- <p>
@@ -60,7 +60,7 @@
             </p> -->
 
             <p>
-                <label for="nbLocks">Nombre de cadenas : </label>
+                <label for="nbLocks">Number of padlocks : </label>
                 <input id="nbLocks" name="nbLocks" type="number" min="0" max="7" value="1" required>
             </p>
             <p>
