@@ -127,7 +127,6 @@ const forms = [
 
 async function updateSettings() {
     //updating effect 
-    document.getElementById('erreurUpdate').style.display = 'none';
     document.getElementById('indexRef').style.display = 'none';
     document.getElementById('waitSpinner').style.display = '';
     setTimeout(() => { document.getElementById('waitSpinner').style.display = 'none'; }, 2000);
@@ -172,6 +171,7 @@ async function updateSettings() {
             }
         }
     }
+    const nbSlidesToUnlock = parseInt(document.getElementById('nbSlidesToUnlock').value);
     const displayTimeline = document.getElementById("displayTimeline").checked;
 
     gameSettings.body = JSON.stringify({
@@ -181,6 +181,7 @@ async function updateSettings() {
         formList: formList,
         nbLocksMin: nbLocksMin,
         nbLocksMax: nbLocksMax,
+        nbSlidesToUnlock: nbSlidesToUnlock,
         displayTimeline: displayTimeline
     });
 

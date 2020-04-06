@@ -89,6 +89,10 @@ h1 {
     cursor: pointer;
 }
 
+th {
+    font-weight: normal;
+}
+
 #nbForms {
     margin: 2px 12px;
 }

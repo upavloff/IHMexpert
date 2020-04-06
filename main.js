@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------------------
 var STEP = 8;
 var NB_LOCKS = 3;
+var NB_SLIDES = 4;
 var formsList = ["Square", "Circle"];
 var nbBlocksToDo = 2;
 var nbFormsByBlock = 4;
@@ -32,6 +33,7 @@ async function setGameParameters() {
             formsFrequence = gameParameters.formsFrequence;
             NB_LOCKS = gameParameters.currentNbLocks;
             formsList = gameParameters.formList;
+            NB_SLIDES = gameParameters.nbSlidesToUnlock;
             displayTimeline = gameParameters.displayTimeline;
             //update blockFormFrequence
             blockFormFrequence = {};
@@ -881,7 +883,7 @@ function Game() {
             }
 
             //unclock part
-            if (nbSlide > 4) { //TODO change 4 in cst
+            if (nbSlide > NB_SLIDES) {
                 //next if is to test if learning state can improve
 
                 if (learningState[nameCurrentForm] <= NB_LOCKS) {

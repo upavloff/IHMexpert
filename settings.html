@@ -14,7 +14,7 @@
 </head>
 
 <body>
-    <h1>Settings</h1>
+    <h1 style="margin: 15px 0px">Settings</h1>
 
     <!--<p>
         Parses CSV into JSON.
@@ -67,12 +67,18 @@
             <p>
                 Forms to choose from :
                 <div>
-                    <input id="formSquare" class="selectForm" name="Square" value="Square" type="checkbox"> Square
-                    <input id="formCircle" class="selectForm" name="Circle" value="Circle" type="checkbox">Circle
-                </div>
-                <div>
-                    <input id="formTriangle" class="selectForm" name="Triangle" value="Triangle" type="checkbox">Triangle
-                    <input id="formCross" class="selectForm" name="Cross" value="Cross" type="checkbox">Cross
+                    <table style="width:100%">
+                        <tr>
+                            <th> <input id="formSquare" class="selectForm" name="Square" value="Square" type="checkbox"> Square </th>
+                            <th> <input id="formCircle" class="selectForm" name="Circle" value="Circle" type="checkbox"> Circle </th>
+                            <th> <input id="formTriangle" class="selectForm" name="Triangle" value="Triangle" type="checkbox"> Triangle</th>
+                            <th> <input id="formCross" class="selectForm" name="Cross" value="Cross" type="checkbox"> Cross </th>
+                        </tr>
+                    </table>
+
+
+
+
                 </div>
             </p>
 
@@ -84,6 +90,10 @@
                 </span>
             </p>
             <p>
+                <label for="nbSlidesToUnlock">Number of Slides to unlock  : </label>
+                <input id="nbSlidesToUnlock" name="nbSlidesToUnlock" type="number" min="2" max="20" value="2" required>
+            </p>
+            <p>
                 Display Timeline :
                 <input type="radio" id="displayTimeline" name="displayTimeline" value="true">True
                 <input type="radio" id="notDisplayTimeline" name="displayTimeline" value="false">False
@@ -93,10 +103,8 @@
                     <button onclick="updateSettings()" style="cursor: pointer;">UPDATE Settings</button>
                     <div id="waitSpinner" class="loader" style="display: none;"></div>
                 </span>
-                <span id='erreurUpdate' style="display: none;"> Error while updating</span>
                 <a id="indexRef" href="index.html" style="display: none;">See changes</a>
             </p>
-
 
         </form>
 
