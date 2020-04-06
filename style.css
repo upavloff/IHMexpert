@@ -32,6 +32,10 @@ button {
     border: 2px solid #4CAF50;
 }
 
+pre {
+    font: 1em Ubuntu, sans-serif;
+}
+
 button:disabled {
     opacity: 0.7;
 }
@@ -44,43 +48,51 @@ button:disabled:hover {
     cursor: not-allowed;
 }
 
-#endGame {
-    display: none;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    position: absolute;
+.blackBG {
+    /*display: none;*/
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     /*padding: 300px;*/
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.35);
 }
 
-#endGameBox {
+.infoBox {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     background-color: whitesmoke;
-    padding: 150px;
-    padding-top: 250px;
+    padding: 50px;
+    /*padding-top: 70px;*/
+    text-align: center;
     position: absolute;
-    top: 50%;
+    top: 50px;
     left: 50%;
     display: block;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, 0);
+    margin-bottom: 50px;
 }
 
-#score {
+.infoTitle {
     font-size: large;
     text-align: center;
     position: absolute;
     width: 150px;
     padding: 10px;
-    top: 30%;
+    top: 10px;
     left: 50%;
     display: block;
     transform: translate(-50%, -50%);
     background-color: #4CAF50;
     color: white;
 }
+
+
+/*
+.infoButton{
+    
+}*/
 
 
 /*

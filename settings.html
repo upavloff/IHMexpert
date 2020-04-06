@@ -39,34 +39,49 @@
         -->
 
 
-        <form id="settingsForm" action="#" onsubmit="return false;">
-            <!--oninput="rangeOutput.value=parseInt(nbTrials.value);"-->
+        <form id="settingsForm" action="#" onsubmit="return false;" oninput="updateFormsDisplay(parseInt(nbForms.value));" style="float: left;">
+            <!--oninput=" rangeOutput.value=parseInt(nbTrials.value);"-->
             <p>
                 <label for="nbBlocksToDo">Number of Blocks to do : </label>
                 <input id="nbBlocksToDo" name="nbBlocksToDo" type="number" min="2" max="10" value="2" required>
             </p>
             <p>
-                <label for="nbFiguresByBlock">Number of figures by Blocks : </label>
-                <input id="nbFiguresByBlock" name="nbFiguresByBlock" type="number" min="2" max="10" value="2" required>
+                <label for="nbForms">Number of different Forms by block :  </label>
+                <input id="nbForms" name="nbForms" type="range" list="tickmarks" value="2" min="2" max="4">
+                <output id="nbFormsOutput" name="rangeOutput" value="10"></output>
+                <datalist id="tickmarks">
+                    <option value="2">
+                    <option value="3">
+                    <option value="4">
+                  </datalist>
             </p>
             <p>
-                Add block <button id="addBlocker" onclick="addBlock()" style="cursor: pointer;"><i id="iconPlus" class="fa fa-plus"></i></button>
-                <div id="listBlock"></div>
+                Numbers of figures appearance by block :
+                <ul>
+                    <li id="figure1">Figure 1 : <input id="freqFigure1" class="formFrequence" name="freqFigure" type="number" required min="1"></li>
+                    <li id="figure2">Figure 2 : <input id="freqFigure2" class="formFrequence" name="freqFigure" type="number" required min="1"></li>
+                    <li id="figure3">Figure 3 : <input id="freqFigure3" class="formFrequence" name="freqFigure" type="number" required min="1"></li>
+                    <li id="figure4">Figure 4 : <input id="freqFigure4" class="formFrequence" name="freqFigure" type="number" required min="1"></li>
+                </ul>
             </p>
-            <!-- <p>
-                <label for="nbTrials">Nombre d'essais :  </label>
-                <input id="nbTrials" name="nbTrials" type="range" min="5" value="10" max="50">
-                <output id="nbTrialsOutput" name="rangeOutput" value="10"></output>
-            </p> -->
+            <p>
+                Forms to choose from :
+                <div>
+                    <input id="formSquare" class="selectForm" name="Square" value="Square" type="checkbox"> Square
+                    <input id="formCircle" class="selectForm" name="Circle" value="Circle" type="checkbox">Circle
+                </div>
+                <div>
+                    <input id="formTriangle" class="selectForm" name="Triangle" value="Triangle" type="checkbox">Triangle
+                    <input id="formCross" class="selectForm" name="Cross" value="Cross" type="checkbox">Cross
+                </div>
+            </p>
 
             <p>
-                <label for="nbLocks">Number of padlocks : </label>
-                <input id="nbLocks" name="nbLocks" type="number" min="0" max="7" value="1" required>
-            </p>
-            <p>
-                Easy mode :
-                <input type="radio" id="easyModeTrue" name="easyMode" value="true">True
-                <input type="radio" id="easyModeFalse" name="easyMode" value="false">False
+                <label for="nbLocksMin">Number of padlocks between : </label>
+                <span> 
+                    <input id="nbLocksMin" name="nbLocksMin" type="number" min="1" max="9" value="1" required> and 
+                    <input id="nbLocksMax" name="nbLocksMax" type="number" min="1" max="10" value="1" required>
+                </span>
             </p>
             <p>
                 Display Timeline :
@@ -74,12 +89,23 @@
                 <input type="radio" id="notDisplayTimeline" name="displayTimeline" value="false">False
             </p>
             <p>
-                <button onclick="updateSettings()" style="cursor: pointer;">UPDATE Settings</button>
-                <a id="indexRef" href="index.html">See changes</a>
+                <span>
+                    <button onclick="updateSettings()" style="cursor: pointer;">UPDATE Settings</button>
+                    <div id="waitSpinner" class="loader" style="display: none;"></div>
+                </span>
+                <span id='erreurUpdate' style="display: none;"> Error while updating</span>
+                <a id="indexRef" href="index.html" style="display: none;">See changes</a>
             </p>
 
 
         </form>
+
+        <div id="divInfo" style="float: right;margin: 100px 100px;">
+            <b>Implicit information</b>
+            <div>nb Total Trials is : <span id="infoNbTotalTrials"></span></div>
+            <div>Number of figure to unlock : <span id="infoFigs"></span> </div>
+            <div>Block size is : <span id="blockSize"></span></div>
+        </div>
 
     </div>
 

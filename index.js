@@ -14,11 +14,15 @@ app.use(express.json( /*{limit:'1mb'} */ ));
 //database of users informations
 const database = new Datastore('database.db');
 database.loadDatabase();
+//erase database
+//database.remove({}, { multi: true }, function(err, numRemoved) {
+//    database.loadDatabase(function(err) {});
+//});
 
 //database of gameParameters
 const gameParameters = new Datastore('gameParameters.db');
 gameParameters.loadDatabase();
-
+var currentNbLocks = 1;
 
 app.get('/api' /*getData*/ , (request, response) => {
     database.find({}, (err, data) => {
@@ -44,8 +48,8 @@ app.post('/api', (request, response) => {
         status: 'success',
         initDate: data.initDate,
         ipUser: data.ipAdress,
-        // facteur : ?
         nbTrials: data.nbTrials,
+        nbFormsByBlock: data.nbFormsByBlock,
         formNameTimeline: data.formNameTimeline,
         errors: data.errors,
         unlock: data.unlock,
@@ -56,8 +60,31 @@ app.post('/api', (request, response) => {
     });
 });
 
+app.get('/gameParameters' /*getData*/ , (request, response) => {
+    console.log('I got a request to send game parameters from main page');
+
+    gameParameters.find({}, (err, data) => {
+        if (err) {
+            response.end();
+            return;
+        }
+        //console.log("currentNbLocks is " + currentNbLocks);
+        //console.log('data[0]["nbLocksMax"] is ' + data[0]["nbLocksMax"]);
+        //console.log('data[0]["nbLocksMin"] is ' + data[0]["nbLocksMin"]);
+        //currentNbLocks = currentNbLocks % (data[0]["nbLocksMax"] - data[0]["nbLocksMin"]) + data[0]["nbLocksMin"] + 1;
+        //console.log("currentNbLocks is " + currentNbLocks);
+        currentNbLocks++;
+        if (currentNbLocks > data[0]["nbLocksMax"]) {
+            currentNbLocks = data[0]["nbLocksMin"];
+        }
+        data[0]['currentNbLocks'] = currentNbLocks;
+        console.log(data);
+        response.json(data);
+    });
+});
+
 app.get('/settings' /*getData*/ , (request, response) => {
-    console.log('I got a request to send game parameters');
+    console.log('I got a request to send game parameters from settings page');
 
     gameParameters.find({}, (err, data) => {
         if (err) {
@@ -85,11 +112,11 @@ app.post('/settings', (request, response) => {
     response.json({
         status: 'success',
         nbBlocksToDo: data.nbBlocksToDo,
-        nbLocks: data.nbLocks,
-        blockList: data.blockList,
-        nbFiguresByBlock: data.nbFiguresByBlock,
+        nbFormsByBlock: data.nbFormsByBlock,
+        formsFrequence: data.formsFrequence,
         formList: data.formList,
-        easyMode: data.easyMode,
+        nbLocksMin: data.nbLocksMin,
+        nbLocksMax: data.nbLocksMax,
         displayTimeline: data.displayTimeline
     });
 });

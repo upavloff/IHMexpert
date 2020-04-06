@@ -5,8 +5,8 @@ var STEP = 8;
 var NB_LOCKS = 3;
 var formsList = ["Square", "Circle"];
 var nbBlocksToDo = 2;
-var nbFiguresByBlock = 4;
-var blockList = [{ 'Square': 2, 'Circle': 2 }];
+var nbFormsByBlock = 4;
+var blockFormFrequence = { 'Square': 2, 'Circle': 2 }; //blockList previously
 var easyMode = true;
 var displayTimeline = true;
 
@@ -21,27 +21,43 @@ $.getJSON("https://api.ipify.org?format=json", function(data) {
 setGameParameters();
 
 async function setGameParameters() {
-    fetch('/settings')
+    fetch('/gameParameters')
         .then(response => response.json())
         .then(data => {
             const gameParameters = data[0];
             console.log(gameParameters);
-            nbFiguresByBlock = gameParameters.nbFiguresByBlock;
             nbBlocksToDo = gameParameters.nbBlocksToDo;
-            blockList = gameParameters.blockList;
-            STEP = nbFiguresByBlock * nbBlocksToDo;
-            NB_LOCKS = gameParameters.nbLocks;
+            nbFormsByBlock = gameParameters.nbFormsByBlock;
+            STEP = nbFormsByBlock * nbBlocksToDo;
+            formsFrequence = gameParameters.formsFrequence;
+            NB_LOCKS = gameParameters.currentNbLocks;
             formsList = gameParameters.formList;
-            easyMode = gameParameters.easyMode;
             displayTimeline = gameParameters.displayTimeline;
+            //update blockFormFrequence
+            blockFormFrequence = {};
+            shuffle(formsList);
+            for (let i in formsFrequence) {
+                blockFormFrequence[formsList[i]] = formsFrequence[i];
+            }
+            //here to drawBoard with only selectable form
+            formsList = formsList.slice(0, formsFrequence.length);
         })
         .catch(err => {
             console.log("erreur dans la mise en place des parametres");
             console.log(err);
         })
-        .then(() => {
+        /*.then(() => {
             Game();
-        })
+        })*/
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * i)
+        const temp = array[i]
+        array[i] = array[j]
+        array[j] = temp
+    }
 }
 
 //--------------------------------------------------------------------------------
@@ -52,6 +68,7 @@ var errors = [];
 var nbLockLeft = []; //unlock state link to the formTimeline
 var nbTotalClick = 0;
 var nbUsefulClick = 0;
+//var listNbUsefulClick = [];
 var listNbUnusefulClick = [];
 var listDuration = [];
 
@@ -61,8 +78,6 @@ var listDuration = [];
 
 
 function Game() {
-
-
 
     const options = {
         method: 'POST',
@@ -88,11 +103,13 @@ function Game() {
             ipUser: ipAdress,
             // facteur : ?
             nbTrials: STEP,
+            nbFormsByBlock: nbFormsByBlock,
             formNameTimeline: formNameTimeline,
             errors: errors,
             unlock: nbLockLeft,
-            listNbUnusefulClick: listNbUnusefulClick, //new
-            listDuration: listDuration, //new
+            //listNbUsefulClick: listNbUsefulClick,
+            listNbUnusefulClick: listNbUnusefulClick,
+            listDuration: listDuration,
             nbClick: nbTotalClick,
             totalDuration: timestamp - new Date(initDate).getTime()
         });
@@ -393,10 +410,10 @@ function Game() {
     var formTimeline = [];
 
     for (let i = 0; i < nbBlocksToDo; i++) {
-        var formToAdd = JSON.parse(JSON.stringify(blockList[i % blockList.length]));
+        var formToAdd = JSON.parse(JSON.stringify(blockFormFrequence));
 
-        for (let j = 0; j < nbFiguresByBlock; j++) {
-            var currentIndex = i * nbFiguresByBlock + j;
+        for (let j = 0; j < nbFormsByBlock; j++) {
+            var currentIndex = i * nbFormsByBlock + j;
             var currentForm = null;
             var tempFormSelected = Object.keys(formToAdd)[Math.floor(Math.random() * Object.keys(formToAdd).length)]
             formToAdd[tempFormSelected] -= 1;
@@ -561,30 +578,18 @@ function Game() {
                     case "Square":
                         formsBoard[i][j] = new Square(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, selectableForm == "Square");
                         nbFormToSelect += selectableForm == "Square" ? 1 : 0;
-                        if (learningState['Square'] == "unlocked") {
-                            formsBoard[i][j].selected = true;
-                        }
                         break;
                     case "Circle":
                         formsBoard[i][j] = new Circle(getGridX(j), getGridY(i), CIRCLE_RADIUS, selectableForm == "Circle");
                         nbFormToSelect += selectableForm == "Circle" ? 1 : 0;
-                        if (learningState['Circle'] == "unlocked") {
-                            formsBoard[i][j].selected = true;
-                        }
                         break;
                     case "Cross":
                         formsBoard[i][j] = new Cross(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, CROSS_THICKNESS, selectableForm == "Cross");
                         nbFormToSelect += selectableForm == "Cross" ? 1 : 0;
-                        if (learningState['Cross'] == "unlocked") {
-                            formsBoard[i][j].selected = true;
-                        }
                         break;
                     case "Triangle":
                         formsBoard[i][j] = new Triangle(getGridX(j), getGridY(i), TRIANGLE_HEIGHT, selectableForm == "Triangle");
                         nbFormToSelect += selectableForm == "Triangle" ? 1 : 0;
-                        if (learningState['Triangle'] == "unlocked") {
-                            formsBoard[i][j].selected = true;
-                        }
                         break;
                     default:
                         console.log("Error while selecting forms for the timeline");
@@ -626,25 +631,42 @@ function Game() {
         let x = event.clientX - canvBoundings.left;
         let y = event.clientY - canvBoundings.top;
 
-        //look for forms to highlight
+        //look for forms to select
+        var selectAllUnlockForm = 'none';
         OUTER: for (let row of formsBoard) {
             for (let form of row) {
                 if (form.contains(x, y) && form.selectable && !form.selected) {
                     form.selected = true; //create this attribute !
                     nbCurrentFormSelected++;
-                    if (nbCurrentFormSelected >= nbFormToSelect) {
+                    nbUsefulClick++;
+                    if (learningState[form.constructor.name] == "unlocked") {
+                        selectAllUnlockForm = form.constructor.name;
+                    } else if (nbCurrentFormSelected >= nbFormToSelect) {
                         document.getElementById("nextButton").disabled = false;
                     }
-                    nbUsefulClick++;
                     break OUTER; //if one form is to highlight no need to look further
                 }
             }
+        }
+
+        if (selectAllUnlockForm != 'none') {
+            for (let row of formsBoard) {
+                for (let form of row) {
+                    if (form.constructor.name == selectAllUnlockForm && form.selectable && !form.selected) {
+                        form.selected = true; //create this attribute !
+                        nbCurrentFormSelected++;
+                    }
+                }
+
+            }
+            document.getElementById("nextButton").disabled = false;
         }
     }
 
     function gameUpdate() {
         //update Game Variable to save :
         nbLockLeft[currentStep] = learningState[nameCurrentForm];
+        //listNbUsefulClick.push(nbUsefulClick);
         listNbUnusefulClick.push(nbTotalClick - nbUsefulClick);
         if (nbTotalClick > nbUsefulClick) {
             errors.push(true);
@@ -675,13 +697,13 @@ function Game() {
         nameCurrentForm = formTimeline[currentStep].constructor.name;
         indexStep.x = getTimelineGridX(currentStep);
         currentTarget = createTarget(nameCurrentForm)
-        boardInfos = newGame(learningState[nameCurrentForm] == 'unlocked' ? 'nothing to select' : nameCurrentForm);
+        boardInfos = newGame(nameCurrentForm); //learningState[nameCurrentForm] == 'unlocked' ? 'nothing to select' : nameCurrentForm);
         formsBoard = boardInfos.formsBoard;
         nbFormToSelect = boardInfos.nbFormToSelect;
         nbCurrentFormSelected = 0;
-        if (learningState[nameCurrentForm] != 'unlocked') {
-            nextButton.disabled = true;
-        }
+        //if (learningState[nameCurrentForm] != 'unlocked') {
+        nextButton.disabled = true;
+        //}
     }
 
     //------------------------------------------------------------------------------
@@ -716,7 +738,6 @@ function Game() {
         ctxScore.font = "bold 18px arial";
         ctxScore.textAlign = "center";
         ctxScore.fillText("SCORE : " + currentScore, SC_WIDTH / 2, SC_HEIGHT / 2 + 7); //magic numbers ...
-
     }
 
     //------------------------------------------------------------------------------
@@ -747,7 +768,7 @@ function Game() {
     targetCanvas.style.top = String(TL_HEIGHT + SC_HEIGHT + TC_TOP_MARGIN) + "px";
     targetCanvas.style.left = String(WIDTH + STROKE) + "px";
     var targetCanvasBoundings = targetCanvas.getBoundingClientRect();
-
+    var targetSelectable = false; //authorize to clic on the target to unlock
     //chrono variables
     var start = new Date(); //begin the timer
     var end = 0;
@@ -765,11 +786,18 @@ function Game() {
     //unlock button
     var unlockButton = new Button(UNLOCK_X, UNLOCK_Y, UNLOCK_W, UNLOCK_H, UNLOCK_RADIUS, ctxTarget);
 
-    targetCanvas.addEventListener("mousemove", highlightButton); //add highlights just with mousemouve
-    targetCanvas.addEventListener("mousedown", unlocker); //add highlights with mouse click
+    targetCanvas.addEventListener("mousemove", (event) => {
+        highlightButton(event);
+        highlightTarget(event);
+    }); //add highlights just with mousemouve
+    targetCanvas.addEventListener("mousedown", (event) => {
+        unlocker(event);
+        selectTarget(event);
+    }); //add highlights with mouse click
 
     //--------------------------------  function ---------------------------------
     function highlightButton( /* type MouseEvent*/ event) {
+        if (!unlockButton) return;
         //get mouse position relative to the canvas
         let x = event.clientX - targetCanvasBoundings.left;
         let y = event.clientY - targetCanvasBoundings.top;
@@ -786,11 +814,13 @@ function Game() {
     }
 
     function unlocker( /* type MouseEvent*/ event) {
+        if (!unlockButton) return;
         //get mouse position relative to the canvas
         let x = event.clientX - targetCanvasBoundings.left;
         let y = event.clientY - targetCanvasBoundings.top;
         if (unlockButton.contains(x, y) && nbCurrentFormSelected >= nbFormToSelect && learningState[nameCurrentForm] != 'unlocked') {
             sliderDisplay();
+            unlockButton = null;
         }
     }
 
@@ -887,27 +917,40 @@ function Game() {
         ctxTarget.textAlign = "center";
         ctxTarget.fillText(timer, TC_WIDTH / 2, 33);
         //draw unlock button
-        unlockButton.draw();
+        if (unlockButton) unlockButton.draw();
         //draw unlock text
         ctxTarget.fillStyle = TARGET_COLOR_FONT;
         ctxTarget.font = "bold 18px arial";
         ctxTarget.textAlign = "center";
-        ctxTarget.fillText("UNLOCK", TC_WIDTH / 2, UNLOCK_Y + 5);
+        var text = "UNLOCK";
+        if (learningState[nameCurrentForm] == 'unlocked') text = "UNLOCKED";
+        else if (!unlockButton) text = '';
+        ctxTarget.fillText(text, TC_WIDTH / 2, UNLOCK_Y + 5);
     }
 
     function createTarget(currentTargetName) {
+        //recreation du bouton si necessaire
+        unlockButton = null;
+        if (!(learningState[nameCurrentForm] == 'unlocked')) {
+            unlockButton = new Button(UNLOCK_X, UNLOCK_Y, UNLOCK_W, UNLOCK_H, UNLOCK_RADIUS, ctxTarget);
+        }
+        //creation of the target form
         switch (currentTargetName) {
             case "Square":
-                currentTarget = new Square(TC_WIDTH / 2, TC_HEIGHT / 2, TC_SQUARE_SIZE, TC_SQUARE_SIZE, false, ctxTarget);
+                targetSelectable = learningState["Square"] == 'unlocked' ? true : false;
+                currentTarget = new Square(TC_WIDTH / 2, TC_HEIGHT / 2, TC_SQUARE_SIZE, TC_SQUARE_SIZE, targetSelectable, ctxTarget);
                 break;
             case "Circle":
-                currentTarget = new Circle(TC_WIDTH / 2, TC_HEIGHT / 2, TC_CIRCLE_RADIUS, false, ctxTarget);
+                targetSelectable = learningState["Circle"] == 'unlocked' ? true : false;
+                currentTarget = new Circle(TC_WIDTH / 2, TC_HEIGHT / 2, TC_CIRCLE_RADIUS, targetSelectable, ctxTarget);
                 break;
             case "Triangle":
-                currentTarget = new Triangle(TC_WIDTH / 2, TC_HEIGHT / 2, TC_TRIANGLE_HEIGHT, false, ctxTarget);
+                targetSelectable = learningState["Triangle"] == 'unlocked' ? true : false;
+                currentTarget = new Triangle(TC_WIDTH / 2, TC_HEIGHT / 2, TC_TRIANGLE_HEIGHT, targetSelectable, ctxTarget);
                 break;
             case "Cross":
-                currentTarget = new Cross(TC_WIDTH / 2, TC_HEIGHT / 2, TC_SQUARE_SIZE, TC_SQUARE_SIZE, TC_CROSS_THICKNESS, false, ctxTarget);
+                targetSelectable = learningState["Cross"] == 'unlocked' ? true : false;
+                currentTarget = new Cross(TC_WIDTH / 2, TC_HEIGHT / 2, TC_SQUARE_SIZE, TC_SQUARE_SIZE, TC_CROSS_THICKNESS, targetSelectable, ctxTarget);
                 break;
             default:
                 console.log("Error while selecting forms for the target");
@@ -932,6 +975,45 @@ function Game() {
         return timer;
     }
 
+    function highlightTarget( /* type MouseEvent*/ event) {
+        //highlights forms inside the forms board canvas
+        //get mouse position relative to the canvas
+        let x = event.clientX - targetCanvasBoundings.left;
+        let y = event.clientY - targetCanvasBoundings.top;
+        //reset cursor
+        document.body.style.cursor = "auto";
+        //clear previous highlight
+        currentTarget.highlight = false; //create this attribute
+
+        //look for forms to highlight
+        if (currentTarget.contains(x, y) && !currentTarget.selected && currentTarget.selectable) {
+            currentTarget.highlight = true; //create this attribute !
+            document.body.style.cursor = "pointer";
+        }
+    }
+
+    function selectTarget( /* type MouseEvent*/ event) {
+        //get mouse position relative to the canvas
+        let x = event.clientX - targetCanvasBoundings.left;
+        let y = event.clientY - targetCanvasBoundings.top;
+
+        //look for forms to select
+        var selectAllUnlockForm = 'none';
+        if (currentTarget.contains(x, y) && currentTarget.selectable && !currentTarget.selected) {
+            currentTarget.selected = true; //create this attribute !
+            nbUsefulClick++;
+            for (let row of formsBoard) {
+                for (let form of row) {
+                    if (form.constructor.name == nameCurrentForm && form.selectable && !form.selected) {
+                        form.selected = true; //create this attribute !
+                        nbCurrentFormSelected++;
+                    }
+                }
+
+            }
+            document.getElementById("nextButton").disabled = false;
+        }
+    }
 
     //------------------------------------------------------------------------------
     //                             learningCanvas
@@ -1030,6 +1112,7 @@ function Game() {
 
     var nextButton = document.getElementById("nextButton");
     //find a better way to choose the position of the nextButton
+    nextButton.style.display = '';
     nextButton.style.top = String(TL_HEIGHT + HEIGHT - nextButton.height) + "px;";
     nextButton.style.margin = String(WIDTH + STROKE) + "px";
     nextButton.disabled = true;
@@ -1043,7 +1126,7 @@ function Game() {
             try {
                 killSlider();
             } catch {
-                console.log('no unlock tried');
+                console.log('try to kill slider already none existing');
             }
         }
     }
