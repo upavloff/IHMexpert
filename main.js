@@ -11,6 +11,7 @@ var blockFormFrequence = { 'Square': 2, 'Circle': 2 }; //blockList previously
 var easyMode = true;
 var displayTimeline = true;
 
+const VIBRATION_STEP = 8;
 const learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
 const initDate = new Date(Date.now());
 var ipAdress = null;
@@ -136,9 +137,26 @@ function Game() {
             this.selected = false;
             this.ctx = context; //necessary because of different canvas
             this.unlocked = false;
+            this.vibrate = false;
+            this.vibrateX = 0;
+            this.vibrateAnimationStep = VIBRATION_STEP;
         }
 
         draw() {
+            if (this.vibrate) {
+                if (this.vibrateAnimationStep <= 0) {
+                    this.vibrateAnimationStep = VIBRATION_STEP + 1; //cst shoulb be put
+                    this.vibrate = false;
+                    this.vibrateX = 0;
+                } else if (this.vibrateAnimationStep <= VIBRATION_STEP / 4) {
+                    this.vibrateX -= 2;
+                } else if (this.vibrateAnimationStep <= 3 * VIBRATION_STEP / 4) {
+                    this.vibrateX += 2;
+                } else {
+                    this.vibrateX -= 2
+                }
+                this.vibrateAnimationStep--;
+            }
             if (this.selected || this.unlocked) {
                 this.ctx.fillStyle = COLOR_SQUARE;
                 this.ctx.fillRect(this.left - SELECT_MARGIN / 2, this.top - SELECT_MARGIN / 2, this.w + SELECT_MARGIN, this.h + SELECT_MARGIN);
@@ -149,7 +167,7 @@ function Game() {
             } else {
                 this.ctx.fillStyle = COLOR_SQUARE;
             }
-            this.ctx.fillRect(this.left, this.top, this.w, this.h);
+            this.ctx.fillRect(this.left + this.vibrateX, this.top, this.w, this.h);
         }
 
         contains(x, y) {
@@ -176,9 +194,26 @@ function Game() {
             this.selected = false;
             this.ctx = context; //necessary because of different canvas
             this.unlocked = false;
+            this.vibrate = false;
+            this.vibrateX = 0;
+            this.vibrateAnimationStep = VIBRATION_STEP;
         }
 
         draw() {
+            if (this.vibrate) {
+                if (this.vibrateAnimationStep <= 0) {
+                    this.vibrateAnimationStep = VIBRATION_STEP + 1; //cst shoulb be put
+                    this.vibrate = false;
+                    this.vibrateX = 0;
+                } else if (this.vibrateAnimationStep <= VIBRATION_STEP / 4) {
+                    this.vibrateX -= 2;
+                } else if (this.vibrateAnimationStep <= 3 * VIBRATION_STEP / 4) {
+                    this.vibrateX += 2;
+                } else {
+                    this.vibrateX -= 2
+                }
+                this.vibrateAnimationStep--;
+            }
             if (this.selected || this.unlocked) { // not done -------------------------------
                 this.ctx.fillStyle = COLOR_CROSS
                 this.ctx.fillRect(this.rect1x - SELECT_MARGIN / 2, this.rect1y - SELECT_MARGIN / 2, this.thickness + SELECT_MARGIN, this.h + SELECT_MARGIN);
@@ -190,8 +225,8 @@ function Game() {
             } else {
                 this.ctx.fillStyle = COLOR_CROSS;
             }
-            this.ctx.fillRect(this.rect1x, this.rect1y, this.thickness, this.h);
-            this.ctx.fillRect(this.rect2x, this.rect2y, this.w, this.thickness);
+            this.ctx.fillRect(this.rect1x + this.vibrateX, this.rect1y, this.thickness, this.h);
+            this.ctx.fillRect(this.rect2x + this.vibrateX, this.rect2y, this.w, this.thickness);
         }
 
         contains(x, y) {
@@ -222,9 +257,26 @@ function Game() {
             this.selected = false;
             this.ctx = context; //necessary because of different canvas
             this.unlocked = false;
+            this.vibrate = false;
+            this.vibrateX = 0;
+            this.vibrateAnimationStep = VIBRATION_STEP;
         }
 
         draw() {
+            if (this.vibrate) {
+                if (this.vibrateAnimationStep <= 0) {
+                    this.vibrateAnimationStep = VIBRATION_STEP + 1; //cst shoulb be put
+                    this.vibrate = false;
+                    this.vibrateX = 0;
+                } else if (this.vibrateAnimationStep <= VIBRATION_STEP / 4) {
+                    this.vibrateX -= 2;
+                } else if (this.vibrateAnimationStep <= 3 * VIBRATION_STEP / 4) {
+                    this.vibrateX += 2;
+                } else {
+                    this.vibrateX -= 2
+                }
+                this.vibrateAnimationStep--;
+            }
             if (this.selected || this.unlocked) {
                 this.ctx.fillStyle = COLOR_CIRCLE;
                 this.ctx.beginPath();
@@ -237,7 +289,7 @@ function Game() {
                 this.ctx.fillStyle = COLOR_CIRCLE;
             }
             this.ctx.beginPath();
-            this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            this.ctx.arc(this.x + this.vibrateX, this.y, this.radius, 0, Math.PI * 2);
             this.ctx.fill();
         }
 
@@ -274,6 +326,9 @@ function Game() {
             this.b_t1_t2 = (this.t2.y - this.a_t1_t2 * this.t2.x);
             this.a_t2_t3 = (this.t2.y - this.t3.y) / (this.t2.x - this.t3.x);
             this.b_t2_t3 = (this.t3.y - this.a_t2_t3 * this.t3.x);
+            this.vibrate = false;
+            this.vibrateX = 0;
+            this.vibrateAnimationStep = VIBRATION_STEP;
 
         }
         slope_t1_t2(x) {
@@ -283,6 +338,20 @@ function Game() {
             return this.a_t2_t3 * x + this.b_t2_t3;
         }
         draw() {
+            if (this.vibrate) {
+                if (this.vibrateAnimationStep <= 0) {
+                    this.vibrateAnimationStep = VIBRATION_STEP + 1; //cst shoulb be put
+                    this.vibrate = false;
+                    this.vibrateX = 0;
+                } else if (this.vibrateAnimationStep <= VIBRATION_STEP / 4) {
+                    this.vibrateX -= 2;
+                } else if (this.vibrateAnimationStep <= 3 * VIBRATION_STEP / 4) {
+                    this.vibrateX += 2;
+                } else {
+                    this.vibrateX -= 2
+                }
+                this.vibrateAnimationStep--;
+            }
             if (this.selected || this.unlocked) {
                 this.ctx.fillStyle = COLOR_TRIANGLE;
                 this.ctx.beginPath();
@@ -298,9 +367,9 @@ function Game() {
                 this.ctx.fillStyle = COLOR_TRIANGLE;
             }
             this.ctx.beginPath();
-            this.ctx.moveTo(this.t1.x, this.t1.y);
-            this.ctx.lineTo(this.t2.x, this.t2.y);
-            this.ctx.lineTo(this.t3.x, this.t3.y);
+            this.ctx.moveTo(this.t1.x + this.vibrateX, this.t1.y);
+            this.ctx.lineTo(this.t2.x + this.vibrateX, this.t2.y);
+            this.ctx.lineTo(this.t3.x + this.vibrateX, this.t3.y);
             this.ctx.fill();
         }
 
@@ -637,16 +706,20 @@ function Game() {
         var selectAllUnlockForm = 'none';
         OUTER: for (let row of formsBoard) {
             for (let form of row) {
-                if (form.contains(x, y) && form.selectable && !form.selected) {
-                    form.selected = true; //create this attribute !
-                    nbCurrentFormSelected++;
-                    nbUsefulClick++;
-                    if (learningState[form.constructor.name] == "unlocked") {
-                        selectAllUnlockForm = form.constructor.name;
-                    } else if (nbCurrentFormSelected >= nbFormToSelect) {
-                        document.getElementById("nextButton").disabled = false;
+                if (form.contains(x, y) && !form.selected) {
+                    if (!form.selectable) {
+                        form.vibrate = true;
+                    } else {
+                        form.selected = true; //create this attribute !
+                        nbCurrentFormSelected++;
+                        nbUsefulClick++;
+                        if (learningState[form.constructor.name] == "unlocked") {
+                            selectAllUnlockForm = form.constructor.name;
+                        } else if (nbCurrentFormSelected >= nbFormToSelect) {
+                            document.getElementById("nextButton").disabled = false;
+                        }
+                        break OUTER; //if one form is to highlight no need to look further
                     }
-                    break OUTER; //if one form is to highlight no need to look further
                 }
             }
         }
