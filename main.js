@@ -4,12 +4,16 @@
 var STEP = 8;
 var NB_LOCKS = 3;
 var NB_SLIDES = 4;
+var TIME_SLIDER = 2000;
 var formsList = ["Square", "Circle"];
+var NB_TARGET_TO_SELECT = 4;
 var nbBlocksToDo = 2;
 var nbFormsByBlock = 4;
 var blockFormFrequence = { 'Square': 2, 'Circle': 2 }; //blockList previously
 var easyMode = true;
 var displayTimeline = true;
+var unlockDone = false; //var saying current if target was unlocked
+var currentUnlockTime = -1;
 
 const VIBRATION_STEP = 8;
 const learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
@@ -34,7 +38,9 @@ async function setGameParameters() {
             formsFrequence = gameParameters.formsFrequence;
             NB_LOCKS = gameParameters.currentNbLocks;
             formsList = gameParameters.formList;
+            NB_TARGET_TO_SELECT = gameParameters.nbTargetToSelect;
             NB_SLIDES = gameParameters.nbSlidesToUnlock;
+            TIME_SLIDER = gameParameters.timeBeforeSliderDisappear;
             displayTimeline = gameParameters.displayTimeline;
             //update blockFormFrequence
             blockFormFrequence = {};
@@ -44,6 +50,7 @@ async function setGameParameters() {
             }
             //here to drawBoard with only selectable form
             formsList = formsList.slice(0, formsFrequence.length);
+            console.log('blockFormFrequence is ' + JSON.stringify(blockFormFrequence));
         })
         .catch(err => {
             console.log("erreur dans la mise en place des parametres");
@@ -63,17 +70,24 @@ function shuffle(array) {
     }
 }
 
+//useful for array sum
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
+
 //--------------------------------------------------------------------------------
 //                  GAME variables to post in the database
 //--------------------------------------------------------------------------------
 var formNameTimeline = [];
-var errors = [];
-var nbLockLeft = []; //unlock state link to the formTimeline
+var listLockState = []; //unlock state link to the formTimeline
 var nbTotalClick = 0;
 var nbUsefulClick = 0;
-//var listNbUsefulClick = [];
+var nbLockOpened = 0;
+var listNbClick = [];
 var listNbUnusefulClick = [];
 var listDuration = [];
+var listTryUnlock = [];
+var listTimeToUnlock = [];
+var listNbFormToSelect = [];
+var listNbLockOpened = [];
 
 
 
@@ -104,22 +118,27 @@ function Game() {
         options.body = JSON.stringify({
             initDate: initDate,
             ipUser: ipAdress,
-            // facteur : ?
             nbTrials: STEP,
+            lockSettings: NB_LOCKS,
+            sliderTimeBeforeDisappear: TIME_SLIDER,
             nbFormsByBlock: nbFormsByBlock,
             formNameTimeline: formNameTimeline,
-            errors: errors,
-            unlock: nbLockLeft,
-            //listNbUsefulClick: listNbUsefulClick,
+            listTryUnlock: listTryUnlock,
+            listLockState: listLockState, //changed
+            listTimeToUnlock: listTimeToUnlock, //new
+            listNbFormToSelect: listNbFormToSelect, //new
+            blockFormFrequence: blockFormFrequence, //new
+            listNbClick: listNbClick, //new
             listNbUnusefulClick: listNbUnusefulClick,
+            listNbLockOpened: listNbLockOpened, //new
             listDuration: listDuration,
-            nbClick: nbTotalClick,
             totalDuration: timestamp - new Date(initDate).getTime()
         });
         const response = await fetch('/api', options);
         const data = await response.json();
         console.log(data);
     }
+    //listNbUsefulClick: listNbUsefulClick,
 
     //------------------class------------------------------
     //probablement à transferer dans un autre fichier js quand on saura comment faire
@@ -451,7 +470,7 @@ function Game() {
     //--------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------
     //                        set up the timeline canvas 
-    //--------------------------------------------------------------------------------
+    //----------------------errors----------------------------------------------------------
     //var STEP = 5;
     const MIN_SIZE = 20;
     const MIN_CIRCLE_RADIUS = MIN_SIZE / 4; //
@@ -640,12 +659,25 @@ function Game() {
     }
 
     function newGame(selectableForm) { //add number of each form or the proportion in the futur
+        var prepareFormsBoard = [];
+        var prepareFormsList = formsList.slice(0, formsList.indexOf(selectableForm)).concat(formsList.slice(formsList.indexOf(selectableForm) + 1));
+
+        for (let i = 0; i < GRID_SIZE; i++) {
+            for (let j = 0; j < GRID_SIZE; j++) {
+                if (i * GRID_SIZE + j < NB_TARGET_TO_SELECT) {
+                    prepareFormsBoard[i * GRID_SIZE + j] = selectableForm;
+                } else {
+                    prepareFormsBoard[i * GRID_SIZE + j] = prepareFormsList[Math.floor(Math.random() * prepareFormsList.length)];
+                }
+            }
+        }
+        shuffle(prepareFormsBoard);
         formsBoard = [];
         nbFormToSelect = 0;
         for (var i = 0; i < GRID_SIZE; i++) {
             formsBoard[i] = [];
             for (var j = 0; j < GRID_SIZE; j++) {
-                switch (formsList[Math.floor(Math.random() * formsList.length)]) {
+                switch (prepareFormsBoard[i * GRID_SIZE + j]) {
                     case "Square":
                         formsBoard[i][j] = new Square(getGridX(j), getGridY(i), SQUARE_SIZE, SQUARE_SIZE, selectableForm == "Square");
                         nbFormToSelect += selectableForm == "Square" ? 1 : 0;
@@ -668,6 +700,8 @@ function Game() {
                 }
             }
         }
+        listNbFormToSelect.push(nbFormToSelect);
+        listLockState[currentStep] = learningState[nameCurrentForm];
         return { formsBoard: formsBoard, nbFormToSelect: nbFormToSelect };
     }
 
@@ -740,14 +774,14 @@ function Game() {
 
     function gameUpdate() {
         //update Game Variable to save :
-        nbLockLeft[currentStep] = learningState[nameCurrentForm];
+        listNbLockOpened[currentStep] = nbLockOpened;
+        listTryUnlock[currentStep] = unlockDone;
+        listTimeToUnlock[currentStep] = currentUnlockTime;
         //listNbUsefulClick.push(nbUsefulClick);
+        listNbClick.push(listNbClick.length > 0 ? nbTotalClick - listNbClick.reduce(reducer) : nbTotalClick)
         listNbUnusefulClick.push(nbTotalClick - nbUsefulClick);
         if (nbTotalClick > nbUsefulClick) {
-            errors.push(true);
             nbUsefulClick = nbTotalClick;
-        } else {
-            errors.push(false);
         }
         var timestamp = Date.now();
         //start is initialise in chrono variables
@@ -759,6 +793,7 @@ function Game() {
         currentStep++;
         currentScore += 10;
         unlockable = true; //to authorize to unlock again
+        sliderable = true; //to authorize to slider again
         if (currentStep >= STEP) {
             console.log("END OF THE GAME");
             endGamePOSTING(); //post infos of the game
@@ -769,6 +804,7 @@ function Game() {
             });
             return;
         }
+        //set current parameters
         nameCurrentForm = formTimeline[currentStep].constructor.name;
         indexStep.x = getTimelineGridX(currentStep);
         currentTarget = createTarget(nameCurrentForm)
@@ -776,9 +812,9 @@ function Game() {
         formsBoard = boardInfos.formsBoard;
         nbFormToSelect = boardInfos.nbFormToSelect;
         nbCurrentFormSelected = 0;
-        //if (learningState[nameCurrentForm] != 'unlocked') {
         nextButton.disabled = true;
-        //}
+        unlockDone = false;
+        currentUnlockTime = -1;
     }
 
     //------------------------------------------------------------------------------
@@ -858,6 +894,8 @@ function Game() {
 
     //to authorize only one unlock at the time
     var unlockable = true;
+    //to authorize only one slider at the time
+    var sliderable = true;
     //unlock button
     var unlockButton = new Button(UNLOCK_X, UNLOCK_Y, UNLOCK_W, UNLOCK_H, UNLOCK_RADIUS, ctxTarget);
 
@@ -894,17 +932,19 @@ function Game() {
         let x = event.clientX - targetCanvasBoundings.left;
         let y = event.clientY - targetCanvasBoundings.top;
         if (unlockButton.contains(x, y) && nbCurrentFormSelected >= nbFormToSelect && learningState[nameCurrentForm] != 'unlocked') {
+            nbUsefulClick++;
             sliderDisplay();
             unlockButton = null;
         }
     }
 
     function sliderDisplay() {
-        if (!unlockable) {
+        if (!sliderable) {
             return;
         } else {
-            unlockable = false;
+            sliderable = false;
         }
+        var startTimeSlider
         const slider = document.createElement('input');
         slider.id = 'slider';
         slider.type = 'range'
@@ -914,7 +954,10 @@ function Game() {
         slider.style.width = String(TC_WIDTH - STROKE) + "px";
         slider.onclick = function() { nbUsefulClick++ };
         slider.onmouseover = function() { this.style.cursor = 'grab' };
-        slider.onmousedown = function() { this.style.cursor = 'grabbing' };
+        slider.onmousedown = function() {
+            this.style.cursor = 'grabbing';
+            startTimeSlider = Date.now();
+        };
         slider.onmouseup = function() { this.style.cursor = 'grab' };
         var color;
         switch (nameCurrentForm) {
@@ -936,6 +979,13 @@ function Game() {
         var oldValue = 0;
         var slideDirection = 'right';
         slider.oninput = (slider = this) => {
+            //timer part
+            if (Date.now() - startTimeSlider > TIME_SLIDER) {
+                unlock();
+                killSlider();
+                return;
+            }
+            //action part
             var newValue = parseInt(slider['target'].value);
             if (slideDirection == 'right') {
                 if (newValue >= oldValue) {
@@ -958,23 +1008,35 @@ function Game() {
             //unclock part
             if (nbSlide > NB_SLIDES) {
                 //next if is to test if learning state can improve
-
-                if (learningState[nameCurrentForm] <= NB_LOCKS) {
-                    learningState[nameCurrentForm] += 1;
-                    unlockable = false;
-                    nbUsefulClick++;
-                    if (learningState[nameCurrentForm] == NB_LOCKS) {
-                        learningState[nameCurrentForm] = "unlocked";
-                    }
-                    killSlider()
-                }
+                unlock();
+                killSlider();
             }
         }
         document.body.appendChild(slider);
     }
 
+    function unlock() {
+        if (!unlockable) return;
+        if (learningState[nameCurrentForm] <= NB_LOCKS) {
+            learningState[nameCurrentForm] += 1;
+            unlockable = false;
+            unlockDone = true; //for listTryUnlock
+            var timestamp = Date.now();
+            currentUnlockTime = (timestamp - start);
+            nbUsefulClick++;
+            nbLockOpened++;
+            if (learningState[nameCurrentForm] == NB_LOCKS) {
+                learningState[nameCurrentForm] = "unlocked";
+            }
+        }
+    }
+
     function killSlider() {
-        document.getElementById('slider').remove();
+        try {
+            document.getElementById('slider').remove();
+        } catch {
+            console.log('slider already killed');
+        }
     }
 
     function drawTarget() {
@@ -1073,7 +1135,6 @@ function Game() {
         let y = event.clientY - targetCanvasBoundings.top;
 
         //look for forms to select
-        var selectAllUnlockForm = 'none';
         if (currentTarget.contains(x, y) && currentTarget.selectable && !currentTarget.selected) {
             currentTarget.selected = true; //create this attribute !
             nbUsefulClick++;
@@ -1198,11 +1259,7 @@ function Game() {
         if (nbCurrentFormSelected >= nbFormToSelect) {
             nbUsefulClick++;
             gameUpdate();
-            try {
-                killSlider();
-            } catch {
-                console.log('try to kill slider already none existing');
-            }
+            killSlider();
         }
     }
 

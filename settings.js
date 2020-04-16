@@ -65,10 +65,12 @@ function updateSee() {
                     formCheckbox.checked = true;
                 }
             });
-
+            document.getElementById('nbTargetToSelect').value = gameParameters.nbTargetToSelect;
             //nbLocks
-            document.getElementById("nbLocksMin").value = gameParameters.nbLocksMin;
-            document.getElementById("nbLocksMax").value = gameParameters.nbLocksMax;
+            document.getElementById("nbLockList").value = gameParameters.nbLockList;
+            //slider
+            document.getElementById('nbSlidesToUnlock').value = gameParameters.nbSlidesToUnlock;
+            document.getElementById('timeBeforeSliderDisappear').value = gameParameters.timeBeforeSliderDisappear;
             //timeline radio button
             if (gameParameters.displayTimeline) {
                 document.getElementById("displayTimeline").checked = true;
@@ -146,12 +148,11 @@ async function updateSettings() {
     });
 
     //padLocks settings
-    const inputNbLocksMax = document.getElementById("nbLocksMax")
-    inputNbLocksMax.setCustomValidity('');
-    const nbLocksMin = parseInt(document.getElementById("nbLocksMin").value);
-    const nbLocksMax = parseInt(inputNbLocksMax.value);
-    if (nbLocksMin >= nbLocksMax) {
-        inputNbLocksMax.setCustomValidity('Number padlocks max must be strictly superior to the number of padlocks min');
+    const inputNbLockList = document.getElementById("nbLockList")
+    inputNbLockList.setCustomValidity('');
+    var nbLockList = inputNbLockList.value.split(",").map(x => +x);
+    if (nbLockList.length < 2) {
+        inputNbLockList.setCustomValidity('List of padlocks should contain at least two values');
         return;
     }
     //form list
@@ -171,7 +172,9 @@ async function updateSettings() {
             }
         }
     }
+    const nbTargetToSelect = parseInt(document.getElementById('nbTargetToSelect').value);
     const nbSlidesToUnlock = parseInt(document.getElementById('nbSlidesToUnlock').value);
+    const timeBeforeSliderDisappear = parseInt(document.getElementById('timeBeforeSliderDisappear').value);
     const displayTimeline = document.getElementById("displayTimeline").checked;
 
     gameSettings.body = JSON.stringify({
@@ -179,9 +182,10 @@ async function updateSettings() {
         nbFormsByBlock: nbFormsByBlock,
         formsFrequence: formsFrequence,
         formList: formList,
-        nbLocksMin: nbLocksMin,
-        nbLocksMax: nbLocksMax,
+        nbTargetToSelect: nbTargetToSelect,
+        nbLockList: nbLockList,
         nbSlidesToUnlock: nbSlidesToUnlock,
+        timeBeforeSliderDisappear: timeBeforeSliderDisappear,
         displayTimeline: displayTimeline
     });
 

@@ -75,23 +75,25 @@
                             <th> <input id="formCross" class="selectForm" name="Cross" value="Cross" type="checkbox"> Cross </th>
                         </tr>
                     </table>
-
-
-
-
                 </div>
             </p>
-
             <p>
-                <label for="nbLocksMin">Number of padlocks between : </label>
+                <label for="nbTargetToSelect">Number of target to select  : </label>
+                <input id="nbTargetToSelect" name="nbTargetToSelect" type="number" min="1" max="16" value="3" required>
+            </p>
+            <p>
+                <label for="nbLockList">Number of padlocks list : [</label>
                 <span> 
-                    <input id="nbLocksMin" name="nbLocksMin" type="number" min="1" max="9" value="1" required> and 
-                    <input id="nbLocksMax" name="nbLocksMax" type="number" min="1" max="10" value="1" required>
+                    <input id="nbLockList" name="nbLockList" type="text" required> ] <span class="commentText"> //fill like an array ex: 3,2,8,4 </span>
                 </span>
             </p>
             <p>
                 <label for="nbSlidesToUnlock">Number of Slides to unlock  : </label>
                 <input id="nbSlidesToUnlock" name="nbSlidesToUnlock" type="number" min="2" max="20" value="2" required>
+            </p>
+            <p>
+                <label for="timeBeforeSliderDisappear">Time before slider automatically disappear  : </label>
+                <input id="timeBeforeSliderDisappear" name="timeBeforeSliderDisappear" type="number" min="500" max="20000" value="1000" required> <span class="commentText"> //time in ms </span>
             </p>
             <p>
                 Display Timeline :

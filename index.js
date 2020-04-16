@@ -15,9 +15,9 @@ app.use(express.json( /*{limit:'1mb'} */ ));
 const database = new Datastore('database.db');
 database.loadDatabase();
 //erase database
-//database.remove({}, { multi: true }, function(err, numRemoved) {
-//    database.loadDatabase(function(err) {});
-//});
+database.remove({}, { multi: true }, function(err, numRemoved) {
+    database.loadDatabase(function(err) {});
+});
 
 //database of gameParameters
 const gameParameters = new Datastore('gameParameters.db');
@@ -46,17 +46,7 @@ app.post('/api', (request, response) => {
     /* repondre au post */
     response.json({
         status: 'success',
-        initDate: data.initDate,
-        ipUser: data.ipAdress,
-        nbTrials: data.nbTrials,
-        nbFormsByBlock: data.nbFormsByBlock,
-        formNameTimeline: data.formNameTimeline,
-        errors: data.errors,
-        unlock: data.unlock,
-        listNbUnusefulClick: data.listNbUnusefulClick,
-        listDuration: data.listDuration,
-        nbClick: data.nbClick,
-        duration: data.duration
+        data: data
     });
 });
 
@@ -74,10 +64,10 @@ app.get('/gameParameters' /*getData*/ , (request, response) => {
         //currentNbLocks = currentNbLocks % (data[0]["nbLocksMax"] - data[0]["nbLocksMin"]) + data[0]["nbLocksMin"] + 1;
         //console.log("currentNbLocks is " + currentNbLocks);
         currentNbLocks++;
-        if (currentNbLocks > data[0]["nbLocksMax"]) {
-            currentNbLocks = data[0]["nbLocksMin"];
+        if (currentNbLocks >= data[0]["nbLockList"].length) {
+            currentNbLocks = 0;
         }
-        data[0]['currentNbLocks'] = currentNbLocks;
+        data[0]['currentNbLocks'] = data[0]["nbLockList"][currentNbLocks];
         console.log(data);
         response.json(data);
     });
@@ -111,13 +101,7 @@ app.post('/settings', (request, response) => {
     /* repondre au post */
     response.json({
         status: 'success',
-        nbBlocksToDo: data.nbBlocksToDo,
-        nbFormsByBlock: data.nbFormsByBlock,
-        formsFrequence: data.formsFrequence,
-        formList: data.formList,
-        nbLocksMin: data.nbLocksMin,
-        nbLocksMax: data.nbLocksMax,
-        displayTimeline: data.displayTimeline
+        data: data
     });
 });
 

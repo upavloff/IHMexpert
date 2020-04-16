@@ -15,7 +15,7 @@ async function getData() {
     const response = await fetch('/api');
     const data = await response.json();
     const dataNewFormat = [];
-
+    console.log(data);
     for (element of data) {
         //html display of the json
         /*
@@ -53,39 +53,69 @@ async function getData() {
 
         //------------------------------------------------------
         //----  tranform data to json convertible to csv
-        var indiceBlock = 1;
+        const jsonFormId = { 'Square': 0, 'Circle': 1, 'Triangle': 2, 'Cross': 3 };
+        const elementSize = element.formNameTimeline.length;
         for (var i in element.formNameTimeline) {
+            console.log('list lock element is :' + element.listLockState[i]);
             dataNewFormat.push({
                 initDate: element.initDate,
                 ipUser: element.ipUser,
                 nbTrials: parseInt(i) + 1,
-                nbBlock: 1 + Math.trunc(parseInt(i) / parseInt(element.nbFormsByBlock)),
                 nbTotalTrials: element.nbTrials,
+                nbBlock: 1 + Math.trunc(parseInt(i) / parseInt(element.nbFormsByBlock)),
+                nbTotalBlock: Math.trunc(elementSize / parseInt(element.nbFormsByBlock)),
+                blockSize: element.nbFormsByBlock,
                 form: element.formNameTimeline[i],
-                error: element.errors[i],
-                unlock: element.unlock[i],
-                nbClick: element.nbClick,
-                //nbUsefulClick: element.listNbUsefulClick[i],
+                formId: jsonFormId[element.formNameTimeline[i]],
+                formFreq: element.blockFormFrequence[element.formNameTimeline[i]],
+                nbFormToSelect: element.listNbFormToSelect[i],
+                success: element.listNbUnusefulClick[i] > 0 ? 0 : 1,
+                lockSettings: element.lockSettings,
+                tryUnlock: element.listTryUnlock[i],
+                unlockState: element.listLockState[i],
+                timeToUnlock: element.listTimeToUnlock[i],
+                sliderTimeBeforeDisappear: element.sliderTimeBeforeDisappear,
+                nbClick: element.listNbClick[i],
                 nbUnusefulClick: element.listNbUnusefulClick[i],
                 duration: element.listDuration[i],
+                nbLockOpened: element.listNbLockOpened[i],
                 totalDuration: element.totalDuration
             });
         }
     }
     const headers = {
-        initDate: 'Date',
-        ipUser: 'User IP',
-        nbTrials: 'nb Trials',
-        nbBlock: 'block number',
-        nbTotalTrials: 'nb Total Trials',
-        form: 'Form Target',
-        error: 'Error',
-        unlock: 'Unlock State',
-        nbClick: 'nb Total Clicks',
-        //nbUsefulClick: 'nb Useful Click',
-        nbUnusefulClick: 'nb Unuseful Click',
-        duration: 'Duration (ms)',
-        totalDuration: 'Total Duration (ms)'
+        //______________________________user info
+        initDate: 'date',
+        ipUser: 'user_ip',
+        //______________________________trial info
+        nbTrials: 'trial_id',
+        nbTotalTrials: 'n_trials',
+        nbBlock: 'block_id',
+        nbTotalBlock: 'n_block',
+        blockSize: 'block_size',
+        form: 'target_shape',
+        formId: 'target_id',
+        formFreq: 'target_freq',
+        nbFormToSelect: 'target_n',
+        //transition duration   ???     diff de time ?
+        //n_locks  ?? whatDoUmean ?
+        success: 'success',
+        lockSettings: 'n_locks',
+        tryUnlock: 'unlock_action',
+        unlockState: 'lock_state',
+        //'n_opened_locker',  
+        timeToUnlock: 'time_unlock',
+        sliderTimeBeforeDisappear: 'lock_duration',
+        nbClick: 'nb_total_click',
+        //n_locks
+        // transition duration ... ?
+        nbUnusefulClick: 'nb_unuseful_click',
+        duration: 'time',
+        //occurence ??
+        //______________________________current state
+        nbLockOpened: 'n_opened_locker',
+        //______________________________all experience info
+        totalDuration: 'exp_total_time'
     }
     return {
         headers: headers,
