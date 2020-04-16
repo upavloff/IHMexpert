@@ -69,12 +69,18 @@ async function getData() {
                 formId: jsonFormId[element.formNameTimeline[i]],
                 formFreq: element.blockFormFrequence[element.formNameTimeline[i]],
                 nbFormToSelect: element.listNbFormToSelect[i],
+                occurence: element.listOccurence[i],
                 success: element.listNbUnusefulClick[i] > 0 ? 0 : 1,
                 lockSettings: element.lockSettings,
                 tryUnlock: element.listTryUnlock[i],
                 unlockState: element.listLockState[i],
                 timeToUnlock: element.listTimeToUnlock[i],
                 sliderTimeBeforeDisappear: element.sliderTimeBeforeDisappear,
+                transitionDuration: element.lockSettings * element.sliderTimeBeforeDisappear,
+                firstUnlockOccurence: element.firstUnlockOccurence,
+                firstUnlockTrial: element.firstUnlockTrial,
+                lastUnlockOccurence: element.lastUnlockOccurence,
+                lastUnlockTrial: element.lastUnlockTrial,
                 nbClick: element.listNbClick[i],
                 nbUnusefulClick: element.listNbUnusefulClick[i],
                 duration: element.listDuration[i],
@@ -97,21 +103,21 @@ async function getData() {
         formId: 'target_id',
         formFreq: 'target_freq',
         nbFormToSelect: 'target_n',
-        //transition duration   ???     diff de time ?
-        //n_locks  ?? whatDoUmean ?
+        occurence: 'occurence',
         success: 'success',
         lockSettings: 'n_locks',
         tryUnlock: 'unlock_action',
         unlockState: 'lock_state',
-        //'n_opened_locker',  
         timeToUnlock: 'time_unlock',
         sliderTimeBeforeDisappear: 'lock_duration',
+        transitionDuration: 'transition_duration',
+        firstUnlockOccurence: 'first_unlock_occurence',
+        firstUnlockTrial: 'first_unlock_trial',
+        lastUnlockOccurence: 'last_unlock_occurence',
+        lastUnlockTrial: 'last_unlock_trial',
         nbClick: 'nb_total_click',
-        //n_locks
-        // transition duration ... ?
         nbUnusefulClick: 'nb_unuseful_click',
         duration: 'time',
-        //occurence ??
         //______________________________current state
         nbLockOpened: 'n_opened_locker',
         //______________________________all experience info

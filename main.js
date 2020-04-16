@@ -88,8 +88,12 @@ var listTryUnlock = [];
 var listTimeToUnlock = [];
 var listNbFormToSelect = [];
 var listNbLockOpened = [];
-
-
+var listOccurence = [];
+var jsonOccurence = { 'Square': 1, 'Circle': 1, 'Triangle': 1, 'Cross': 1 };
+var firstUnlockOccurence = -1;
+var firstUnlockTrial = -1;
+var lastUnlockOccurence = -1;
+var lastUnlockTrial = -1;
 
 
 
@@ -124,13 +128,18 @@ function Game() {
             nbFormsByBlock: nbFormsByBlock,
             formNameTimeline: formNameTimeline,
             listTryUnlock: listTryUnlock,
-            listLockState: listLockState, //changed
-            listTimeToUnlock: listTimeToUnlock, //new
-            listNbFormToSelect: listNbFormToSelect, //new
-            blockFormFrequence: blockFormFrequence, //new
-            listNbClick: listNbClick, //new
+            listLockState: listLockState,
+            listTimeToUnlock: listTimeToUnlock,
+            listNbFormToSelect: listNbFormToSelect,
+            blockFormFrequence: blockFormFrequence,
+            listNbClick: listNbClick,
             listNbUnusefulClick: listNbUnusefulClick,
             listNbLockOpened: listNbLockOpened, //new
+            firstUnlockOccurence: firstUnlockOccurence,
+            firstUnlockTrial: firstUnlockTrial,
+            lastUnlockOccurence: lastUnlockOccurence,
+            lastUnlockTrial: lastUnlockTrial,
+            listOccurence: listOccurence,
             listDuration: listDuration,
             totalDuration: timestamp - new Date(initDate).getTime()
         });
@@ -774,10 +783,11 @@ function Game() {
 
     function gameUpdate() {
         //update Game Variable to save :
+        listOccurence[currentStep] = jsonOccurence[nameCurrentForm];
+        jsonOccurence[nameCurrentForm]++;
         listNbLockOpened[currentStep] = nbLockOpened;
         listTryUnlock[currentStep] = unlockDone;
         listTimeToUnlock[currentStep] = currentUnlockTime;
-        //listNbUsefulClick.push(nbUsefulClick);
         listNbClick.push(listNbClick.length > 0 ? nbTotalClick - listNbClick.reduce(reducer) : nbTotalClick)
         listNbUnusefulClick.push(nbTotalClick - nbUsefulClick);
         if (nbTotalClick > nbUsefulClick) {
@@ -1007,7 +1017,6 @@ function Game() {
 
             //unclock part
             if (nbSlide > NB_SLIDES) {
-                //next if is to test if learning state can improve
                 unlock();
                 killSlider();
             }
@@ -1017,6 +1026,11 @@ function Game() {
 
     function unlock() {
         if (!unlockable) return;
+        if (!firstUnlockOccurence) firstUnlockOccurence = jsonOccurence[nameCurrentForm];
+        if (!firstUnlockTrial) firstUnlockTrial = currentStep + 1; //+1 'cause current step start from 0
+        lastUnlockOccurence = jsonOccurence[nameCurrentForm];
+        lastUnlockTrial = currentStep + 1;
+        //next if is to test if learning state can improve
         if (learningState[nameCurrentForm] <= NB_LOCKS) {
             learningState[nameCurrentForm] += 1;
             unlockable = false;
