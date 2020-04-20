@@ -12,7 +12,7 @@ var nbFormsByBlock = 4;
 var blockFormFrequence = { 'Square': 2, 'Circle': 2 }; //blockList previously
 var easyMode = true;
 var displayTimeline = true;
-var unlockDone = false; //var saying current if target was unlocked
+var unlockDone = 0; //var saying how current target was unlocked
 var currentUnlockTime = -1;
 
 const VIBRATION_STEP = 8;
@@ -90,10 +90,10 @@ var listNbFormToSelect = [];
 var listNbLockOpened = [];
 var listOccurence = [];
 var jsonOccurence = { 'Square': 1, 'Circle': 1, 'Triangle': 1, 'Cross': 1 };
-var firstUnlockOccurence = -1;
-var firstUnlockTrial = -1;
-var lastUnlockOccurence = -1;
-var lastUnlockTrial = -1;
+var firstUnlockOccurence = { 'Square': -1, 'Circle': -1, 'Triangle': -1, 'Cross': -1 };
+var firstUnlockTrial = { 'Square': -1, 'Circle': -1, 'Triangle': -1, 'Cross': -1 };
+var lastUnlockOccurence = { 'Square': -1, 'Circle': -1, 'Triangle': -1, 'Cross': -1 };
+var lastUnlockTrial = { 'Square': -1, 'Circle': -1, 'Triangle': -1, 'Cross': -1 };
 
 
 
@@ -756,7 +756,7 @@ function Game() {
                         form.selected = true; //create this attribute !
                         nbCurrentFormSelected++;
                         nbUsefulClick++;
-                        if (learningState[form.constructor.name] == "unlocked") {
+                        if (learningState[form.constructor.name] == NB_LOCKS) {
                             selectAllUnlockForm = form.constructor.name;
                         } else if (nbCurrentFormSelected >= nbFormToSelect) {
                             document.getElementById("nextButton").disabled = false;
@@ -818,12 +818,12 @@ function Game() {
         nameCurrentForm = formTimeline[currentStep].constructor.name;
         indexStep.x = getTimelineGridX(currentStep);
         currentTarget = createTarget(nameCurrentForm)
-        boardInfos = newGame(nameCurrentForm); //learningState[nameCurrentForm] == 'unlocked' ? 'nothing to select' : nameCurrentForm);
+        boardInfos = newGame(nameCurrentForm); //learningState[nameCurrentForm] == NB_LOCKS ? 'nothing to select' : nameCurrentForm);
         formsBoard = boardInfos.formsBoard;
         nbFormToSelect = boardInfos.nbFormToSelect;
         nbCurrentFormSelected = 0;
         nextButton.disabled = true;
-        unlockDone = false;
+        unlockDone = 0;
         currentUnlockTime = -1;
     }
 
@@ -941,8 +941,9 @@ function Game() {
         //get mouse position relative to the canvas
         let x = event.clientX - targetCanvasBoundings.left;
         let y = event.clientY - targetCanvasBoundings.top;
-        if (unlockButton.contains(x, y) && nbCurrentFormSelected >= nbFormToSelect && learningState[nameCurrentForm] != 'unlocked') {
+        if (unlockButton.contains(x, y) && nbCurrentFormSelected >= nbFormToSelect && learningState[nameCurrentForm] != NB_LOCKS) {
             nbUsefulClick++;
+            unlockDone = 2;
             sliderDisplay();
             unlockButton = null;
         }
@@ -989,10 +990,11 @@ function Game() {
         var oldValue = 0;
         var slideDirection = 'right';
         slider.oninput = (slider = this) => {
+            unlockDone = 3;
             //timer part
             if (Date.now() - startTimeSlider > TIME_SLIDER) {
-                unlock();
                 killSlider();
+                unlock();
                 return;
             }
             //action part
@@ -1026,22 +1028,20 @@ function Game() {
 
     function unlock() {
         if (!unlockable) return;
-        if (!firstUnlockOccurence) firstUnlockOccurence = jsonOccurence[nameCurrentForm];
-        if (!firstUnlockTrial) firstUnlockTrial = currentStep + 1; //+1 'cause current step start from 0
-        lastUnlockOccurence = jsonOccurence[nameCurrentForm];
-        lastUnlockTrial = currentStep + 1;
+        if (learningState[nameCurrentForm] == NB_LOCKS) return;
+        if (firstUnlockOccurence[nameCurrentForm] < 0) firstUnlockOccurence[nameCurrentForm] = jsonOccurence[nameCurrentForm];
+        if (firstUnlockTrial[nameCurrentForm] < 0) firstUnlockTrial[nameCurrentForm] = currentStep + 1; //+1 'cause current step start from 0
+        lastUnlockOccurence[nameCurrentForm] = jsonOccurence[nameCurrentForm];
+        lastUnlockTrial[nameCurrentForm] = currentStep + 1;
         //next if is to test if learning state can improve
-        if (learningState[nameCurrentForm] <= NB_LOCKS) {
+        if (learningState[nameCurrentForm] < NB_LOCKS) {
             learningState[nameCurrentForm] += 1;
             unlockable = false;
-            unlockDone = true; //for listTryUnlock
+            unlockDone = 1; //for listTryUnlock
             var timestamp = Date.now();
             currentUnlockTime = (timestamp - start);
             nbUsefulClick++;
             nbLockOpened++;
-            if (learningState[nameCurrentForm] == NB_LOCKS) {
-                learningState[nameCurrentForm] = "unlocked";
-            }
         }
     }
 
@@ -1074,7 +1074,7 @@ function Game() {
         ctxTarget.font = "bold 18px arial";
         ctxTarget.textAlign = "center";
         var text = "UNLOCK";
-        if (learningState[nameCurrentForm] == 'unlocked') text = "UNLOCKED";
+        if (learningState[nameCurrentForm] == NB_LOCKS) text = "UNLOCKED";
         else if (!unlockButton) text = '';
         ctxTarget.fillText(text, TC_WIDTH / 2, UNLOCK_Y + 5);
     }
@@ -1082,25 +1082,25 @@ function Game() {
     function createTarget(currentTargetName) {
         //recreation du bouton si necessaire
         unlockButton = null;
-        if (!(learningState[nameCurrentForm] == 'unlocked')) {
+        if (!(learningState[nameCurrentForm] == NB_LOCKS)) {
             unlockButton = new Button(UNLOCK_X, UNLOCK_Y, UNLOCK_W, UNLOCK_H, UNLOCK_RADIUS, ctxTarget);
         }
         //creation of the target form
         switch (currentTargetName) {
             case "Square":
-                targetSelectable = learningState["Square"] == 'unlocked' ? true : false;
+                targetSelectable = learningState["Square"] == NB_LOCKS ? true : false;
                 currentTarget = new Square(TC_WIDTH / 2, TC_HEIGHT / 2, TC_SQUARE_SIZE, TC_SQUARE_SIZE, targetSelectable, ctxTarget);
                 break;
             case "Circle":
-                targetSelectable = learningState["Circle"] == 'unlocked' ? true : false;
+                targetSelectable = learningState["Circle"] == NB_LOCKS ? true : false;
                 currentTarget = new Circle(TC_WIDTH / 2, TC_HEIGHT / 2, TC_CIRCLE_RADIUS, targetSelectable, ctxTarget);
                 break;
             case "Triangle":
-                targetSelectable = learningState["Triangle"] == 'unlocked' ? true : false;
+                targetSelectable = learningState["Triangle"] == NB_LOCKS ? true : false;
                 currentTarget = new Triangle(TC_WIDTH / 2, TC_HEIGHT / 2, TC_TRIANGLE_HEIGHT, targetSelectable, ctxTarget);
                 break;
             case "Cross":
-                targetSelectable = learningState["Cross"] == 'unlocked' ? true : false;
+                targetSelectable = learningState["Cross"] == NB_LOCKS ? true : false;
                 currentTarget = new Cross(TC_WIDTH / 2, TC_HEIGHT / 2, TC_SQUARE_SIZE, TC_SQUARE_SIZE, TC_CROSS_THICKNESS, targetSelectable, ctxTarget);
                 break;
             default:
@@ -1247,7 +1247,7 @@ function Game() {
     function drawLocks() {
         for (let i = 0; i < formsList.length; i++) {
             for (let j = 0; j < NB_LOCKS; j++) {
-                if (learningState[formsList[i]] > j || learningState[formsList[i]] == 'unlocked') {
+                if (learningState[formsList[i]] > j || learningState[formsList[i]] == NB_LOCKS) {
                     ctxLearning.drawImage(imgUnlock, getImgGridX(j), getImgGridY(i), IMG_WIDTH, IMG_HEIGHT);
                 } else {
                     ctxLearning.drawImage(imgLock, getImgGridX(j), getImgGridY(i), IMG_WIDTH, IMG_HEIGHT);
