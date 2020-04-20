@@ -56,7 +56,6 @@ async function getData() {
         const jsonFormId = { 'Square': 0, 'Circle': 1, 'Triangle': 2, 'Cross': 3 };
         const elementSize = element.formNameTimeline.length;
         for (var i in element.formNameTimeline) {
-            console.log('list lock element is :' + element.listLockState[i]);
             dataNewFormat.push({
                 initDate: element.initDate,
                 ipUser: element.ipUser,
