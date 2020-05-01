@@ -16,6 +16,9 @@ passContainer.addEventListener('animationend', () => {
     passContainer.style.animation = "";
 });
 
+const listBetweenElement = [];
+
+
 function validatePassword(password) {
     fetch('/password')
         .then(response => response.json())
@@ -66,11 +69,8 @@ function updateSee() {
                 }
             });
             document.getElementById('nbTargetToSelect').value = gameParameters.nbTargetToSelect;
-            //nbLocks
-            document.getElementById("nbLockList").value = gameParameters.nbLockList;
-            //slider
-            document.getElementById('nbSlidesToUnlock').value = gameParameters.nbSlidesToUnlock;
-            document.getElementById('timeBeforeSliderDisappear').value = gameParameters.timeBeforeSliderDisappear;
+            //nbLocks - slider
+            addBetweenElement(gameParameters.betweenElements);
             //timeline radio button
             if (gameParameters.displayTimeline) {
                 document.getElementById("displayTimeline").checked = true;
@@ -86,6 +86,129 @@ function updateSee() {
 }
 updateSee();
 
+var numeroBetweenElement = 1;
+
+function addBetweenElement(btwElmtList = [{}]) {
+    btwElmtList.forEach(element => {
+        listBetweenElement.push({});
+        //main paragraph
+        const currentDiv = document.createElement('div');
+        currentDiv.className = "BetweenElement";
+        currentDiv.id = "BetweenElement" + numeroBetweenElement;
+        currentDiv.appendChild(document.createTextNode("BetweenElement " + numeroBetweenElement + " "));
+        //display triangle button
+
+        const triangleDown = document.createElement('i');
+        triangleDown.className = "fa fa-caret-down";
+        triangleDown.style = "cursor: pointer";
+        triangleDown.addEventListener("click", () => {
+            if (triangleDown.className == "fa fa-caret-down") {
+                const son = triangleDown.nextElementSibling;
+                son.style.display = "";
+                triangleDown.className = "fa fa-caret-up";
+                son.nextElementSibling.style.display = "";
+                son.nextElementSibling.nextElementSibling.style.display = "";
+                son.nextElementSibling.nextElementSibling.nextElementSibling.style.display = "";
+            } else {
+                const son = triangleDown.nextElementSibling;
+                son.style.display = "none";
+                son.nextElementSibling.style.display = "none";
+                son.nextElementSibling.nextElementSibling.style.display = "none";
+                son.nextElementSibling.nextElementSibling.nextElementSibling.style.display = "none";
+                triangleDown.className = "fa fa-caret-down";
+            }
+
+        });
+        //Locks 
+        const nbLock = document.createElement('p');
+        nbLock.className = "nbLock";
+        nbLock.innerHTML = "Number of padlocks :";
+        const inputLock = document.createElement('input');
+        inputLock.type = "number";
+        inputLock.id = "nbLock" + numeroBetweenElement;
+        inputLock.name = "padlock";
+        inputLock.min = "1";
+        inputLock.required = true;
+        if (element.nbLock) {
+            inputLock.value = element.nbLock;
+        }
+        nbLock.appendChild(inputLock);
+        nbLock.style.marginLeft = "20px";
+        nbLock.style.display = "none";
+
+        //Number of slides
+        const nbSlidesToUnlock = document.createElement('p');
+        nbSlidesToUnlock.className = "nbSlidesToUnlock";
+        nbSlidesToUnlock.innerHTML = "Number of Slides to unlock  :";
+        const inputNbSlidesToUnlock = document.createElement('input');
+        inputNbSlidesToUnlock.type = "number";
+        inputNbSlidesToUnlock.id = "nbSlidesToUnlock" + numeroBetweenElement;
+        inputNbSlidesToUnlock.name = "nbSlides";
+        inputNbSlidesToUnlock.min = "1";
+        inputNbSlidesToUnlock.required = true;
+        if (element.nbSlides) {
+            inputNbSlidesToUnlock.value = element.nbSlides;
+        }
+        //inputNbSlidesToUnlock.value = form;
+        nbSlidesToUnlock.appendChild(inputNbSlidesToUnlock);
+        nbSlidesToUnlock.style.marginLeft = "20px";
+        nbSlidesToUnlock.style.display = "none";
+
+        //timer slider
+        const timeBeforeSliderDisappear = document.createElement('p');
+        timeBeforeSliderDisappear.className = "timeBeforeSliderDisappear";
+        timeBeforeSliderDisappear.innerHTML = "Time before slider automatically disappear  :";
+        const inputTimeSlider = document.createElement('input');
+        inputTimeSlider.type = "number";
+        inputTimeSlider.id = "timeBeforeSliderDisappear" + numeroBetweenElement;
+        inputTimeSlider.name = "padlock";
+        inputTimeSlider.min = "1";
+        inputTimeSlider.required = true;
+        if (element.timeSlider) {
+            inputTimeSlider.value = element.timeSlider;
+        }
+        //add comment
+        const comment = document.createElement('span');
+        comment.className = "commentText";
+        comment.innerHTML = "  //time in ms";
+
+        timeBeforeSliderDisappear.appendChild(inputTimeSlider);
+        timeBeforeSliderDisappear.appendChild(comment);
+        timeBeforeSliderDisappear.style.marginLeft = "20px";
+        timeBeforeSliderDisappear.style.display = "none";
+
+
+        //delete element option
+        const deleteBetweenElement = document.createElement('i');
+        deleteBetweenElement.className = "fa fa-trash";
+        deleteBetweenElement.style = "cursor: pointer";
+        deleteBetweenElement.addEventListener("click", () => {
+            deleteBetweenElement.parentElement.remove();
+            const elements = document.querySelectorAll(".BetweenElement");
+            numeroBetweenElement = 1;
+            elements.forEach(element => {
+                element.id = "BetweenElement" + numeroBetweenElement;
+                element.childNodes[0].nodeValue = "BetweenElement " + numeroBetweenElement + " ";
+                numeroBetweenElement += 1;
+            });
+        });
+        deleteBetweenElement.style.marginLeft = "20px";
+        deleteBetweenElement.style.display = "none";
+
+        currentDiv.appendChild(triangleDown);
+        currentDiv.appendChild(nbLock);
+        currentDiv.appendChild(nbSlidesToUnlock);
+        currentDiv.appendChild(timeBeforeSliderDisappear);
+        currentDiv.appendChild(deleteBetweenElement);
+
+
+        const betweenElementList = document.getElementById("betweenElementList");
+        betweenElementList.appendChild(currentDiv);
+
+        numeroBetweenElement += 1;
+    });
+
+}
 
 function updateFormsDisplay(value) {
     for (let i = 2; i <= value; i++) {
@@ -147,14 +270,21 @@ async function updateSettings() {
         }
     });
 
-    //padLocks settings
-    const inputNbLockList = document.getElementById("nbLockList")
-    inputNbLockList.setCustomValidity('');
-    var nbLockList = inputNbLockList.value.split(",").map(x => +x);
-    if (nbLockList.length < 2) {
-        inputNbLockList.setCustomValidity('List of padlocks should contain at least two values');
+    //padLocks - slider settings
+    var betweenElementSettings = [];
+    betweenElements = document.querySelectorAll(".BetweenElement");
+    if (betweenElements.length <= 0) {
+        alert('Create at least one between element !');
         return;
     }
+    betweenElements.forEach(element => {
+        var inputBetweenElementList = element.getElementsByTagName("input");
+        const nbLock = inputBetweenElementList[0].value;
+        const nbSlides = inputBetweenElementList[1].value;
+        const timeSlider = inputBetweenElementList[2].value;
+        betweenElementSettings.push({ "nbLock": nbLock, "nbSlides": nbSlides, "timeSlider": timeSlider });
+    });
+
     //form list
     const inputFormList = document.getElementsByClassName("selectForm");
     var formList = [];
@@ -173,8 +303,6 @@ async function updateSettings() {
         }
     }
     const nbTargetToSelect = parseInt(document.getElementById('nbTargetToSelect').value);
-    const nbSlidesToUnlock = parseInt(document.getElementById('nbSlidesToUnlock').value);
-    const timeBeforeSliderDisappear = parseInt(document.getElementById('timeBeforeSliderDisappear').value);
     const displayTimeline = document.getElementById("displayTimeline").checked;
 
     gameSettings.body = JSON.stringify({
@@ -183,9 +311,7 @@ async function updateSettings() {
         formsFrequence: formsFrequence,
         formList: formList,
         nbTargetToSelect: nbTargetToSelect,
-        nbLockList: nbLockList,
-        nbSlidesToUnlock: nbSlidesToUnlock,
-        timeBeforeSliderDisappear: timeBeforeSliderDisappear,
+        betweenElements: betweenElementSettings,
         displayTimeline: displayTimeline
     });
 

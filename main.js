@@ -36,7 +36,7 @@ async function setGameParameters() {
             nbFormsByBlock = gameParameters.nbFormsByBlock;
             STEP = nbFormsByBlock * nbBlocksToDo;
             formsFrequence = gameParameters.formsFrequence;
-            NB_LOCKS = gameParameters.currentNbLocks;
+            NB_LOCKS = gameParameters.nbLock;
             formsList = gameParameters.formList;
             NB_TARGET_TO_SELECT = gameParameters.nbTargetToSelect;
             NB_SLIDES = gameParameters.nbSlidesToUnlock;

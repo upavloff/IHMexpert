@@ -82,18 +82,8 @@
                 <input id="nbTargetToSelect" name="nbTargetToSelect" type="number" min="1" max="16" value="3" required>
             </p>
             <p>
-                <label for="nbLockList">Number of padlocks list : [</label>
-                <span> 
-                    <input id="nbLockList" name="nbLockList" type="text" required> ] <span class="commentText"> //fill like an array ex: 3,2,8,4 </span>
-                </span>
-            </p>
-            <p>
-                <label for="nbSlidesToUnlock">Number of Slides to unlock  : </label>
-                <input id="nbSlidesToUnlock" name="nbSlidesToUnlock" type="number" min="2" max="20" value="2" required>
-            </p>
-            <p>
-                <label for="timeBeforeSliderDisappear">Time before slider automatically disappear  : </label>
-                <input id="timeBeforeSliderDisappear" name="timeBeforeSliderDisappear" type="number" min="500" max="20000" value="1000" required> <span class="commentText"> //time in ms </span>
+                Add between element <button id="addBetweenElementer" onclick="addBetweenElement()" style="cursor: pointer;"><i id="iconPlus" class="fa fa-plus"></i></button>
+                <div id="betweenElementList"></div>
             </p>
             <p>
                 Display Timeline :

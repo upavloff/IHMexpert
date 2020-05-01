@@ -15,14 +15,14 @@ app.use(express.json( /*{limit:'1mb'} */ ));
 const database = new Datastore('database.db');
 database.loadDatabase();
 //erase database
-database.remove({}, { multi: true }, function(err, numRemoved) {
-    database.loadDatabase(function(err) {});
-});
+//database.remove({}, { multi: true }, function(err, numRemoved) {
+//    database.loadDatabase(function(err) {});
+//});
 
 //database of gameParameters
 const gameParameters = new Datastore('gameParameters.db');
 gameParameters.loadDatabase();
-var currentNbLocks = 1;
+var currentBetweenElement = 1;
 
 app.get('/api' /*getData*/ , (request, response) => {
     database.find({}, (err, data) => {
@@ -63,11 +63,15 @@ app.get('/gameParameters' /*getData*/ , (request, response) => {
         //console.log('data[0]["nbLocksMin"] is ' + data[0]["nbLocksMin"]);
         //currentNbLocks = currentNbLocks % (data[0]["nbLocksMax"] - data[0]["nbLocksMin"]) + data[0]["nbLocksMin"] + 1;
         //console.log("currentNbLocks is " + currentNbLocks);
-        currentNbLocks++;
-        if (currentNbLocks >= data[0]["nbLockList"].length) {
-            currentNbLocks = 0;
+        currentBetweenElement++;
+        if (currentBetweenElement >= data[0]["betweenElements"].length) {
+            currentBetweenElement = 0;
         }
-        data[0]['currentNbLocks'] = data[0]["nbLockList"][currentNbLocks];
+        const currentBetweenJson = data[0]["betweenElements"][currentBetweenElement];
+        data[0]['nbLock'] = currentBetweenJson['nbLock'];
+        data[0]['nbSlidesToUnlock'] = currentBetweenJson['nbSlides'];
+        data[0]['timeBeforeSliderDisappear'] = currentBetweenJson['timeSlider'];
+
         console.log(data);
         response.json(data);
     });
