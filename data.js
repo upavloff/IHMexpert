@@ -77,6 +77,7 @@ async function getData() {
                 success: element.listNbUnusefulClick[i] > 0 ? 0 : 1,
                 duration: element.listDuration[i],
                 timeToUnlock: element.listTimeToUnlock[i],
+                sliderDisplaySpan: element.listSliderDisplaySpan[i],
                 nbLockOpened: element.listNbLockOpened[i],
                 firstUnlockOccurence: element.firstUnlockOccurence[element.formNameTimeline[i]],
                 firstUnlockTrial: element.firstUnlockTrial[element.formNameTimeline[i]],
@@ -111,6 +112,7 @@ async function getData() {
         success: 'success',
         duration: 'time',
         timeToUnlock: 'time_unlock',
+        sliderDisplaySpan: 'slider_display_span',
         //______________________________current state
         nbLockOpened: 'n_opened_locker',
         firstUnlockOccurence: 'first_unlock_occurence',

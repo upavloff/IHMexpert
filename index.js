@@ -15,9 +15,9 @@ app.use(express.json( /*{limit:'1mb'} */ ));
 const database = new Datastore('database.db');
 database.loadDatabase();
 //erase database
-//database.remove({}, { multi: true }, function(err, numRemoved) {
-//    database.loadDatabase(function(err) {});
-//});
+database.remove({}, { multi: true }, function(err, numRemoved) {
+    database.loadDatabase(function(err) {});
+});
 
 //database of gameParameters
 const gameParameters = new Datastore('gameParameters.db');

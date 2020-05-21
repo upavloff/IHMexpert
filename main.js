@@ -104,6 +104,7 @@ var listTimeToUnlock = [];
 var listNbFormToSelect = [];
 var listNbLockOpened = [];
 var listOccurence = [];
+var listSliderDisplaySpan = [];
 var jsonOccurence = { 'Square': 1, 'Circle': 1, 'Triangle': 1, 'Cross': 1 };
 var firstUnlockOccurence = { 'Square': -1, 'Circle': -1, 'Triangle': -1, 'Cross': -1 };
 var firstUnlockTrial = { 'Square': -1, 'Circle': -1, 'Triangle': -1, 'Cross': -1 };
@@ -145,6 +146,7 @@ function Game() {
             listTryUnlock: listTryUnlock,
             listLockState: listLockState,
             listTimeToUnlock: listTimeToUnlock,
+            listSliderDisplaySpan: listSliderDisplaySpan,
             listNbFormToSelect: listNbFormToSelect,
             blockFormFrequence: blockFormFrequence,
             listNbClick: listNbClick,
@@ -806,6 +808,7 @@ function Game() {
         listTimeToUnlock[currentStep] = currentUnlockTime;
         listNbClick.push(listNbClick.length > 0 ? nbTotalClick - listNbClick.reduce(reducer) : nbTotalClick)
         listNbUnusefulClick.push(nbTotalClick - nbUsefulClick);
+        listSliderDisplaySpan[currentStep] = unlockDone == 1 ? sliderDisplaySpan : -1;
         if (nbTotalClick > nbUsefulClick) {
             nbUsefulClick = nbTotalClick;
         }
@@ -917,6 +920,11 @@ function Game() {
     ctxTarget.lineWidth = STROKE;
 
     var currentTarget = createTarget(formTimeline[0].constructor.name);
+    var sliderDisplaySpan;
+
+    //condition to kill slider
+    var timerComplete = false;
+    var nbSlideComplete = false;
 
     //to authorize only one unlock at the time
     var unlockable = true;
@@ -971,7 +979,8 @@ function Game() {
         } else {
             sliderable = false;
         }
-        var startTimeSlider
+        sliderDisplaySpan = Date.now();
+        var startTimeSlider;
         const slider = document.createElement('input');
         slider.id = 'slider';
         slider.type = 'range'
@@ -1009,9 +1018,8 @@ function Game() {
             unlockDone = 3;
             //timer part
             if (Date.now() - startTimeSlider > TIME_SLIDER) {
-                killSlider();
+                timerComplete = true;
                 unlock();
-                return;
             }
             //action part
             var newValue = parseInt(slider['target'].value);
@@ -1035,14 +1043,17 @@ function Game() {
 
             //unclock part
             if (nbSlide > NB_SLIDES) {
+                nbSlideComplete = true;
                 unlock();
-                killSlider();
             }
         }
         document.body.appendChild(slider);
     }
 
     function unlock() {
+        if (!(timerComplete && nbSlideComplete)) {
+            return
+        }
         if (!unlockable) return;
         if (learningState[nameCurrentForm] == NB_LOCKS) return;
         if (firstUnlockOccurence[nameCurrentForm] < 0) firstUnlockOccurence[nameCurrentForm] = jsonOccurence[nameCurrentForm];
@@ -1059,6 +1070,10 @@ function Game() {
             nbUsefulClick++;
             nbLockOpened++;
         }
+        sliderDisplaySpan = Date.now() - sliderDisplaySpan;
+        killSlider();
+        timerComplete = false;
+        nbSlideComplete = false;
     }
 
     function killSlider() {
