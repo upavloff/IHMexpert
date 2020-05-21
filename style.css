@@ -1,3 +1,7 @@
+body {
+    overflow-y: hidden;
+}
+
 #timelineCanvas {
     position: absolute;
     top: 0;

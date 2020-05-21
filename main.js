@@ -16,6 +16,7 @@ var NB_SLIDES = 4;
 var TIME_SLIDER = 2000;
 var formsList = ["Square", "Circle"];
 var NB_TARGET_TO_SELECT = 4;
+var BETWEEN_ELEMENT_INDEX = 0;
 var nbBlocksToDo = 2;
 var nbFormsByBlock = 4;
 var blockFormFrequence = { 'Square': 2, 'Circle': 2 }; //blockList previously
@@ -55,6 +56,7 @@ async function setGameParameters() {
             NB_SLIDES = gameParameters.nbSlidesToUnlock;
             TIME_SLIDER = gameParameters.timeBeforeSliderDisappear;
             displayTimeline = gameParameters.displayTimeline;
+            BETWEEN_ELEMENT_INDEX = gameParameters.betweenElementIndex;
             //update blockFormFrequence
             blockFormFrequence = {};
             shuffle(formsList);
@@ -154,7 +156,8 @@ function Game() {
             lastUnlockTrial: lastUnlockTrial,
             listOccurence: listOccurence,
             listDuration: listDuration,
-            totalDuration: timestamp - new Date(initDate).getTime()
+            totalDuration: timestamp - new Date(initDate).getTime(),
+            betweenElementIndex: BETWEEN_ELEMENT_INDEX
         });
         const response = await fetch('/api', options);
         const data = await response.json();

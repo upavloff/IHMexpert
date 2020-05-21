@@ -22,7 +22,7 @@ database.loadDatabase();
 //database of gameParameters
 const gameParameters = new Datastore('gameParameters.db');
 gameParameters.loadDatabase();
-var currentBetweenElement = 1;
+var betweenElementIndexMemory = [];
 
 app.get('/api' /*getData*/ , (request, response) => {
     database.find({}, (err, data) => {
@@ -39,9 +39,11 @@ app.get('/api' /*getData*/ , (request, response) => {
 app.post('/api', (request, response) => {
     console.log('I got a request to log data');
     const data = request.body;
-    //new Date(timestamp - data.initDate);
     database.insert(data);
     console.log(data);
+
+    //save which condition just occured
+    betweenElementIndexMemory[data.betweenElementIndex] += 1;
 
     /* repondre au post */
     response.json({
@@ -58,26 +60,25 @@ app.get('/gameParameters' /*getData*/ , (request, response) => {
             response.end();
             return;
         }
-        //console.log("currentNbLocks is " + currentNbLocks);
-        //console.log('data[0]["nbLocksMax"] is ' + data[0]["nbLocksMax"]);
-        //console.log('data[0]["nbLocksMin"] is ' + data[0]["nbLocksMin"]);
-        //currentNbLocks = currentNbLocks % (data[0]["nbLocksMax"] - data[0]["nbLocksMin"]) + data[0]["nbLocksMin"] + 1;
-        //console.log("currentNbLocks is " + currentNbLocks);
-        currentBetweenElement++;
-        if (currentBetweenElement >= data[0]["betweenElements"].length) {
-            currentBetweenElement = 0;
+
+        if (betweenElementIndexMemory.length != data[0]["betweenElements"].length) {
+            betweenElementIndexMemory.length = data[0]["betweenElements"].length;
+            betweenElementIndexMemory.fill(0);
         }
+        currentBetweenElement = argMin(betweenElementIndexMemory);
         const currentBetweenJson = data[0]["betweenElements"][currentBetweenElement];
+
         data[0]['nbLock'] = currentBetweenJson['nbLock'];
         data[0]['nbSlidesToUnlock'] = currentBetweenJson['nbSlides'];
         data[0]['timeBeforeSliderDisappear'] = currentBetweenJson['timeSlider'];
+        data[0]['betweenElementIndex'] = currentBetweenElement;
 
         console.log(data);
         response.json(data);
     });
 });
 
-app.get('/settings' /*getData*/ , (request, response) => {
+app.get('/settings', (request, response) => {
     console.log('I got a request to send game parameters from settings page');
 
     gameParameters.find({}, (err, data) => {
@@ -115,3 +116,9 @@ app.get('/password' /*getData*/ , (request, response) => {
         password: 'gilles'
     });
 });
+
+
+
+function argMin(array) {
+    return [].map.call(array, (x, i) => [x, i]).reduce((r, a) => (a[0] < r[0] ? a : r))[1];
+}
