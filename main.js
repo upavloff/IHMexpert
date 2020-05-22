@@ -934,8 +934,8 @@ function Game() {
     var unlockButton = new Button(UNLOCK_X, UNLOCK_Y, UNLOCK_W, UNLOCK_H, UNLOCK_RADIUS, ctxTarget);
 
     targetCanvas.addEventListener("mousemove", (event) => {
-        highlightButton(event);
         highlightTarget(event);
+        highlightButton(event);
     }); //add highlights just with mousemouve
     targetCanvas.addEventListener("mousedown", (event) => {
         unlocker(event);
@@ -945,18 +945,24 @@ function Game() {
     //--------------------------------  function ---------------------------------
     function highlightButton( /* type MouseEvent*/ event) {
         if (!unlockButton) return;
+        console.log('highlight alors que pas de button');
         //get mouse position relative to the canvas
         let x = event.clientX - targetCanvasBoundings.left;
         let y = event.clientY - targetCanvasBoundings.top;
-        //reset cursor
-        document.body.style.cursor = "auto";
+        //reset cursor done by highlightTarget()
+
         //clear previous highlight
-        unlockButton.highlight = false; //create this attribute
+        unlockButton.highlight = false;
 
         //look for forms to highlight
         if (unlockButton.contains(x, y)) {
-            unlockButton.highlight = true; //create this attribute !
-            document.body.style.cursor = "pointer";
+            if (nbCurrentFormSelected >= nbFormToSelect) {
+                unlockButton.highlight = true;
+                document.body.style.cursor = "pointer";
+            } else {
+                document.body.style.cursor = "not-allowed";
+            }
+
         }
     }
 
