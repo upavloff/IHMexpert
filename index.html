@@ -41,14 +41,26 @@ evolves over time.
         </div>
     </div>
 
-    <div id="mobileRestriction">
+    <div id="mobileRestriction" style="display: none;">
         <div class="blackBG" style="background-color: #4CAF50;"></div>
-        <div id="explainGameBox" class="infoBox">
+        <div class="infoBox">
             <div class="infoTitle">IHM Expert</div>
             <pre>
 Thank you for your interest however this 
 
 website isn't suited for mobile or tablet
+            </pre>
+        </div>
+    </div>
+
+    <div id="ipRestriction" style="display: none;">
+        <div class="blackBG" style="background-color: #4CAF50;"></div>
+        <div class="infoBox">
+            <div class="infoTitle">IHM Expert</div>
+            <pre>
+Thank you for your interest however you 
+
+can not do the experience more than once
             </pre>
         </div>
     </div>
@@ -71,8 +83,9 @@ website isn't suited for mobile or tablet
             <button onclick="window.location.reload();">PLAY AGAIN <i class="fa fa-repeat"></i></button>
         </div>
     </div>
-    <!-- this script is to get the ip adress-->
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="verification.js"></script>
     <script src="main.js"></script>
     <script src="confetti.js"></script>
 

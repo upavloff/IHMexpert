@@ -77,6 +77,11 @@ function updateSee() {
             } else {
                 document.getElementById("notDisplayTimeline").checked = true;
             }
+            if (gameParameters.authorizeRetest) {
+                document.getElementById("authorizeRetest").checked = true;
+            } else {
+                document.getElementById("notAuthorizeRetest").checked = true;
+            }
             updateFormsDisplay(formsFrequence.length);
         })
         .catch(err => {
@@ -304,6 +309,7 @@ async function updateSettings() {
     }
     const nbTargetToSelect = parseInt(document.getElementById('nbTargetToSelect').value);
     const displayTimeline = document.getElementById("displayTimeline").checked;
+    const authorizeRetest = document.getElementById("authorizeRetest").checked;
 
     gameSettings.body = JSON.stringify({
         nbBlocksToDo: nbBlocksToDo,
@@ -312,7 +318,8 @@ async function updateSettings() {
         formList: formList,
         nbTargetToSelect: nbTargetToSelect,
         betweenElements: betweenElementSettings,
-        displayTimeline: displayTimeline
+        displayTimeline: displayTimeline,
+        authorizeRetest: authorizeRetest
     });
 
     const response = await fetch('/settings', gameSettings);
