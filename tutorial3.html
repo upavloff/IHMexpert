@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>IHM expert - Tutorial</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tutorial.css">
+</head>
+
+<body>
+    <div class="blackBG"></div>
+    <div id="explainGameBox" class="infoBox">
+        <div class="infoTitle">TUTO 3 : Unlock the Expert Method</div>
+        <div id="part1">
+            <pre>
+We will now learn how to unlock the expert method. Initially, the expert 
+method associated with each symbol is locked by several lockers (2 lockers 
+in this tutorial). 
+</pre>
+            <pre>
+At each trial you can unlock only one locker by 
+</pre>
+            <pre>
+1- clicking on the button “unlock” and then
+</pre>
+            <pre>
+2- moving the handle of the slider <b>until</b> the locker is white and opened.
+            </pre>
+
+            <div class="infoDivButton">
+                <button class="infoButton" onclick="nextSlide()">NEXT</button>
+            </div>
+        </div>
+
+        <div id="part2" style="display: none;">
+            <pre>
+Follow these steps to unlock the <b>expert</b> method :
+                </pre>
+            <pre class="condition" id="tuto3step1">
+1. Select all the forms corresponding to the target form.
+            </pre>
+            <pre id="tuto3step2" class="condition">2. Here, instead of clicking on the next button, click on the unlock button 
+underneath the target symbol.</pre>
+            <pre id="tuto3step3" class="condition">
+3. The slider that just appear need to be 'slided' to unlock one padlock.
+So slide the slider until it disappear and a padlock turn white.
+                </pre>
+            <pre id="tuto3step4" class="condition">
+4. Now click on the next button and reiterate that process one more time.
+                </pre>
+            <pre id="tuto3step5" class="condition">
+5. Use the expert mode for this form.
+                </pre>
+
+
+            <div id="boardTuto3" class="board">
+                <div class="container">
+                    <canvas id="timelineCanvasTuto3" class="timelineCanvas"></canvas>
+                    <canvas id="formsBoardCanvasTuto3" class="formsBoardCanvas"></canvas>
+                </div>
+                <canvas id="scoreCanvasTuto3" class="scoreCanvas"></canvas>
+                <canvas id="targetCanvasTuto3" class="targetCanvas"></canvas>
+                <canvas id="learningCanvasTuto3" class="learningCanvas"></canvas>
+
+                <button id="nextButtonTuto3" style="display: none;">Next</button>
+
+            </div>
+
+        </div>
+        <div id="buttonRedoTuto3" class="infoDivButton" style="display: none;">
+            <button class="infoButton" onclick="redoTuto3()">Retry the last tutorial<i class="fa fa-repeat"></i></button>
+        </div>
+
+        <div id="endTuto" class="infoDivButton" style="display: none;">
+            <button class="infoButton" onclick="location.href='index.html'">Start the experiment</button>
+        </div>
+    </div>
+
+    <script>
+        function nextSlide() {
+            document.getElementById('part1').style.display = 'none';
+            document.getElementById('part2').style.display = '';
+            //GameTuto3();
+        }
+
+        function redoTuto3() {
+            document.getElementById("buttonRedoTuto3").style.display = 'none';
+            const conditions = document.getElementsByClassName("condition");
+            Array.prototype.forEach.call(conditions, condition => {
+                condition.style.color = '';
+            });
+            GameTuto3();
+            document.getElementById('boardTuto3').style.display = "";
+        }
+    </script>
+
+    <script src="tutorial3.js"></script>
+
+</body>
+
+</html>

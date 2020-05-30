@@ -1,0 +1,33 @@
+body {
+    overflow: visible;
+}
+
+.timelineCanvas {
+    position: absolute;
+    top: inherit;
+    left: 0;
+}
+
+.formsBoardCanvas {
+    position: absolute;
+    left: 0;
+}
+
+.learningCanvas {
+    position: absolute;
+    left: 0;
+}
+
+.scoreCanvas {
+    position: absolute;
+    left: 0;
+}
+
+.targetCanvas {
+    position: absolute;
+    left: 0;
+}
+
+.board {
+    position: relative;
+}

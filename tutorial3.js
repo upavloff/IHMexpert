@@ -1,9 +1,9 @@
 //-----------------------------------------------------------------------------------
 //                            GAME PARAMETERS
 //-----------------------------------------------------------------------------------
-//var STEP = 3;
+var STEP = 3;
 var NB_LOCKS3 = 2;
-/*var NB_SLIDES = 4;
+var NB_SLIDES = 4;
 var TIME_SLIDER = 2000;
 var formsList = ["Square", "Circle", "Triangle"];
 var NB_TARGET_TO_SELECT = 3;
@@ -31,7 +31,10 @@ function shuffle(array) {
 
 //useful for array sum
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
-*/
+
+//launch the game
+GameTuto3();
+
 function GameTuto3() {
 
     //------------------class------------------------------

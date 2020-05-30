@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>IHM expert - Tutorial</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tutorial.css">
+</head>
+
+<body>
+    <div class="blackBG"></div>
+    <div id="explainGameBox" class="infoBox">
+        <div class="infoTitle">TUTO 1 : Novice Method</div>
+        <pre>
+Learn to use the <b>Novice</b> method.
+            </pre>
+        <pre id="tuto1step1">
+1. Select in the grid all the symbols corresponding to the target
+symbol.
+</pre>
+        <pre id="tuto1step2">
+2. Once all target symbols are selected, the “Next” button will be clickable.
+</pre>
+        <pre id="tuto1step3">
+3. Press the button to continue.
+</pre>
+        <pre id="tuto1step4">
+4. Repeat this step three times.
+            </pre>
+
+        <!--<div class="infoDivButton">
+                <button class="infoButton" onclick="goToSlideTuto(int(2))">START TUTORIAL</button>
+            </div>-->
+        <div id="boardTuto1" class="board">
+            <div class="container">
+                <canvas id="timelineCanvasTuto1" class="timelineCanvas"></canvas>
+                <canvas id="formsBoardCanvasTuto1" class="formsBoardCanvas"></canvas>
+            </div>
+            <canvas id="targetCanvasTuto1" class="targetCanvas"></canvas>
+
+            <button id="nextButtonTuto1" style="display: none;">Next</button>
+        </div>
+
+
+        <div id="buttonToTuto2" class="infoDivButton" style="display: none;">
+            <button class="infoButton" onclick="location.href='tutorial2.html'">NEXT TUTO</button>
+        </div>
+    </div>
+
+    <script src="tutorial1.js"></script>
+
+</body>
+
+</html>

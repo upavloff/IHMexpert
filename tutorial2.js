@@ -1,9 +1,9 @@
 //-----------------------------------------------------------------------------------
 //                            GAME PARAMETERS
 //-----------------------------------------------------------------------------------
-/*var STEP = 3;*/
+var STEP = 3;
 var NB_LOCKS2 = 0;
-/*var NB_SLIDES = 4;
+var NB_SLIDES = 4;
 var TIME_SLIDER = 2000;
 var formsList = ["Square", "Circle", "Triangle"];
 var NB_TARGET_TO_SELECT = 3;
@@ -14,7 +14,26 @@ var blockFormFrequence = { 'Triangle': 3 };
 var easyMode = true;
 var displayTimeline = true;
 var unlockDone = 0; //var saying how current target was unlocked
-var currentUnlockTime = -1;*/
+var currentUnlockTime = -1;
+
+const VIBRATION_STEP = 8;
+const learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
+const initDate = new Date(Date.now());
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * i)
+        const temp = array[i]
+        array[i] = array[j]
+        array[j] = temp
+    }
+}
+
+//useful for array sum
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
+
+//launch Game
+GameTuto2();
 
 function GameTuto2() {
     //------------------class------------------------------

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>IHM expert - Tutorial</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tutorial.css">
+</head>
+
+<body>
+    <div class="blackBG"></div>
+    <div id="explainGameBox" class="infoBox">
+        <div class="infoTitle">TUTO 2 : Expert Method</div>
+        <pre>
+We will now use the expert method that is <b>3 times faster</b>.
+            </pre>
+        <pre id="tuto2step1">
+1. Select the target symbol or one of the symbol corresponding to the target symbol in the grid. 
+Automatically, all similar symbols in the grid will be selected.
+</pre>
+        <pre id="tuto2step2">
+2. Once all target symbols are selected, the Next button will be clickable.
+</pre>
+        <pre id="tuto2step3">
+3. Press the button to continue.
+</pre>
+        <pre id="tuto2step4">
+4. Repeat this task three times.
+            </pre>
+
+        <div id="boardTuto2" class="board">
+            <div class="container">
+                <canvas id="timelineCanvasTuto2" class="timelineCanvas"></canvas>
+                <canvas id="formsBoardCanvasTuto2" class="formsBoardCanvas"></canvas>
+            </div>
+            <canvas id="scoreCanvasTuto2" class="scoreCanvas"></canvas>
+            <canvas id="targetCanvasTuto2" class="targetCanvas"></canvas>
+            <canvas id="learningCanvasTuto2" class="learningCanvas"></canvas>
+
+            <button id="nextButtonTuto2" style="display: none;">Next</button>
+
+        </div>
+
+
+        <div id="buttonToTuto3" class="infoDivButton" style="display: none;">
+            <button class="infoButton" onclick="location.href='tutorial3.html'">NEXT TUTO</button>
+        </div>
+    </div>
+
+    <script src="tutorial2.js"></script>
+
+</body>
+
+</html>

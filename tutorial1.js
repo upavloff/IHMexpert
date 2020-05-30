@@ -32,6 +32,9 @@ function shuffle(array) {
 //useful for array sum
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
+//launch Game
+GameTuto1();
+
 function GameTuto1() {
 
     //------------------class------------------------------
@@ -405,7 +408,7 @@ function GameTuto1() {
             if (formToAdd[tempFormSelected] == 0) {
                 delete formToAdd[tempFormSelected];
             }
-            switch ("Circle") {
+            switch ("Triangle") {
                 case "Square":
                     currentForm = new Square(getTimelineGridX(currentIndex), getTimelineGridY(), MIN_SQUARE_SIZE, MIN_SQUARE_SIZE, false, ctxTimeline);
                     break;
@@ -550,6 +553,7 @@ function GameTuto1() {
 
     function newGame(selectableForm) { //add number of each form or the proportion in the futur
         var prepareFormsBoard = [];
+        console.log('formsList is ' + formsList);
         var prepareFormsList = formsList.slice(0, formsList.indexOf(selectableForm)).concat(formsList.slice(formsList.indexOf(selectableForm) + 1));
 
         for (let i = 0; i < GRID_SIZE; i++) {
