@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>IHM expert - Tutorial</title>
+    <link rel="stylesheet" href="style.css">
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
+</head>
+<style>
+    body {
+        overflow: visible;
+    }
+    
+    .timelineCanvas {
+        position: absolute;
+        top: inherit;
+        left: 0;
+    }
+    
+    .formsBoardCanvas {
+        position: absolute;
+        left: 0;
+    }
+    
+    .learningCanvas {
+        position: absolute;
+        left: 0;
+    }
+    
+    .scoreCanvas {
+        position: absolute;
+        left: 0;
+    }
+    
+    .targetCanvas {
+        position: absolute;
+        left: 0;
+    }
+    
+    .board {
+        position: relative;
+    }
+</style>
+
+<body>
+
+    <div id="explainGame1">
+        <div class="blackBG"></div>
+        <div id="explainGameBox" class="infoBox">
+            <div class="infoTitle" style="width: 200px;">Welcome to our study</div>
+            <pre>
+<b>Introduction:</b> You are invited to participate in a study to improve understanding of user
+behavior with an interactive system.
+            </pre>
+            <pre>
+This study is conducted by Gilles Bailly and Evanthia Dimara (Sorbonne University) who will
+be delighted to answer your questions ( gilles.bailly@sorbonne-universite.fr ). This study
+was approved by The INSEAD Internal Review Board (reference 201915).
+            </pre>
+            <pre>
+<b>Task:</b> The task is to select symbols as quickly as possible.
+You will first make a tutorial in three steps to learn how to select symbols:
+    - Tuto 1: Learn to use the Novice method.
+    - Tuto 2: Learn to use the Expert method.
+    - Tuto 3: Learn to unlock the Expert method.
+            </pre>
+            <pre>
+Press the "Start Tutorial" button to begin the tutorial.
+            </pre>
+
+            <div class="infoDivButton">
+                <button class="infoButton" onclick="goToNextTuto();GameTuto1();">START TUTORIAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ***********************  TUTO 1***********************************   -->
+
+    <div id="explainGame2" style="display: none;">
+        <div class="blackBG"></div>
+        <div id="explainGameBox" class="infoBox">
+            <div class="infoTitle">TUTO 1</div>
+            <pre>
+Learn to use the <b>Novice</b> method.
+            </pre>
+            <pre id="tuto1step1">
+1. Select in the grid all the symbols corresponding to the target
+symbol.
+</pre>
+            <pre id="tuto1step2">
+2. Once all target symbols are selected, the “Next” button will be clickable.
+</pre>
+            <pre id="tuto1step3">
+3. Press the button to continue.
+</pre>
+            <pre id="tuto1step4">
+4. Repeat this step three times.
+            </pre>
+
+            <!--<div class="infoDivButton">
+                <button class="infoButton" onclick="goToSlideTuto(int(2))">START TUTORIAL</button>
+            </div>-->
+            <div id="boardTuto1" class="board">
+                <div class="container">
+                    <canvas id="timelineCanvasTuto1" class="timelineCanvas"></canvas>
+                    <canvas id="formsBoardCanvasTuto1" class="formsBoardCanvas"></canvas>
+                </div>
+                <canvas id="targetCanvasTuto1" class="targetCanvas"></canvas>
+
+                <button id="nextButtonTuto1" style="display: none;">Next</button>
+            </div>
+
+
+            <div id="buttonToTuto2" class="infoDivButton" style="display: none;">
+                <button class="infoButton" onclick="goToNextTuto();GameTuto2();">NEXT TUTO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ***********************  TUTO  2 ***********************************   -->
+
+    <div id="explainGame3" style="display: none;">
+        <div class="blackBG"></div>
+        <div id="explainGameBox" class="infoBox">
+            <div class="infoTitle">TUTO 2</div>
+            <pre>
+We will now use the expert method that is <b>3 times faster</b>.
+            </pre>
+            <pre id="tuto2step1">
+1. Select the target symbol or one of the symbol corresponding to the target symbol in the grid. 
+Automatically, all similar symbols in the grid will be selected.
+</pre>
+            <pre id="tuto2step2">
+2. Once all target symbols are selected, the Next button will be clickable.
+</pre>
+            <pre id="tuto2step3">
+3. Press the button to continue.
+</pre>
+            <pre id="tuto2step4">
+4. Repeat this task three times.
+            </pre>
+
+            <div id="boardTuto2" class="board">
+                <div class="container">
+                    <canvas id="timelineCanvasTuto2" class="timelineCanvas"></canvas>
+                    <canvas id="formsBoardCanvasTuto2" class="formsBoardCanvas"></canvas>
+                </div>
+                <canvas id="scoreCanvasTuto2" class="scoreCanvas"></canvas>
+                <canvas id="targetCanvasTuto2" class="targetCanvas"></canvas>
+                <canvas id="learningCanvasTuto2" class="learningCanvas"></canvas>
+
+                <button id="nextButtonTuto2" style="display: none;">Next</button>
+
+            </div>
+
+
+            <div id="buttonToTuto3" class="infoDivButton" style="display: none;">
+                <button class="infoButton" onclick="goToNextTuto()">NEXT TUTO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ***********************  TUTO  3 ***********************************   -->
+
+    <div id="explainGame4" style="display: auto;">
+        <div class="blackBG"></div>
+        <div id="explainGameBox" class="infoBox">
+            <div class="infoTitle">TUTO 3</div>
+            <div id="part1">
+                <pre>
+We will now learn how to unlock the expert method.
+Initially, the expert method associated with each symbol is locked by several lockers.
+You need to unlock ALL the lockers to be able to use the expert method.
+But each time, you can only open one locker at the time.
+            </pre>
+
+                <div class="infoDivButton">
+                    <button class="infoButton" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+
+            <div id="part2" style="display: none;">
+                <pre>
+Follow these steps to unlock the <b>expert</b> method :
+                </pre>
+                <pre class="condition" id="tuto3step1">
+1. Select all the forms corresponding to the target form.
+            </pre>
+                <pre id="tuto3step2" class="condition">2. Here, instead of clicking on the next button, click on the unlock button 
+underneath the target symbol.</pre>
+                <pre id="tuto3step3" class="condition">
+3. The slider that just appear need to be 'slided' to unlock one padlock.
+So slide the slider until it disappear and a padlock turn white.
+                </pre>
+                <pre id="tuto3step4" class="condition">
+4. Now click on the next button and reiterate that process one more time.
+                </pre>
+                <pre id="tuto3step5" class="condition">
+5. Use the expert mode for this form.
+                </pre>
+
+
+                <div id="boardTuto3" class="board">
+                    <div class="container">
+                        <canvas id="timelineCanvasTuto3" class="timelineCanvas"></canvas>
+                        <canvas id="formsBoardCanvasTuto3" class="formsBoardCanvas"></canvas>
+                    </div>
+                    <canvas id="scoreCanvasTuto3" class="scoreCanvas"></canvas>
+                    <canvas id="targetCanvasTuto3" class="targetCanvas"></canvas>
+                    <canvas id="learningCanvasTuto3" class="learningCanvas"></canvas>
+
+                    <button id="nextButtonTuto3" style="display: none;">Next</button>
+
+                </div>
+
+            </div>
+            <div id="buttonRedoTuto3" class="infoDivButton" style="display: none;">
+                <button class="infoButton" onclick="redoTuto3()">Try again <i class="fa fa-repeat"></i></button>
+            </div>
+
+            <div id="endTuto" class="infoDivButton" style="display: none;">
+                <button class="infoButton" onclick="location.href='index.html'">Sart for real</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var currentSlide = 1;
+
+        function goToNextTuto() {
+            document.getElementById("explainGame" + currentSlide).style.display = 'none';
+            currentSlide++;
+            document.getElementById("explainGame" + currentSlide).style.display = '';
+        }
+
+        function nextSlide() {
+            document.getElementById('part1').style.display = 'none';
+            document.getElementById('part2').style.display = '';
+            GameTuto3();
+        }
+
+        function redoTuto3() {
+            document.getElementById("buttonRedoTuto3").style.display = 'none';
+            const conditions = document.getElementsByClassName("condition");
+            Array.prototype.forEach.call(conditions, condition => {
+                condition.style.color = '';
+            });
+            GameTuto3();
+            document.getElementById('boardTuto3').style.display = "";
+        }
+    </script>
+    <script src="tutorial1.js"></script>
+    <script src="tutorial2.js"></script>
+    <script src="tutorial3.js"></script>
+</body>
+
+</html>

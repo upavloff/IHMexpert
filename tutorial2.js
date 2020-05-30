@@ -1,172 +1,22 @@
 //-----------------------------------------------------------------------------------
 //                            GAME PARAMETERS
 //-----------------------------------------------------------------------------------
-var STEP = 8;
-var NB_LOCKS = 3;
-var NB_SLIDES = 4;
+/*var STEP = 3;*/
+var NB_LOCKS2 = 0;
+/*var NB_SLIDES = 4;
 var TIME_SLIDER = 2000;
-var formsList = ["Square", "Circle"];
-var NB_TARGET_TO_SELECT = 4;
+var formsList = ["Square", "Circle", "Triangle"];
+var NB_TARGET_TO_SELECT = 3;
 var BETWEEN_ELEMENT_INDEX = 0;
-var nbBlocksToDo = 2;
-var nbFormsByBlock = 4;
-var blockFormFrequence = { 'Square': 2, 'Circle': 2 }; //blockList previously
+var nbBlocksToDo = 1;
+var nbFormsByBlock = 3;
+var blockFormFrequence = { 'Triangle': 3 };
 var easyMode = true;
 var displayTimeline = true;
 var unlockDone = 0; //var saying how current target was unlocked
-var currentUnlockTime = -1;
+var currentUnlockTime = -1;*/
 
-const VIBRATION_STEP = 8;
-const learningState = { 'Square': 0, 'Circle': 0, 'Triangle': 0, 'Cross': 0 };
-const initDate = new Date(Date.now());
-var authorizeRetest = true;
-var ipAdress = null;
-$.getJSON("https://api.ipify.org?format=json", function(data) {
-    ipAdress = data.ip;
-    testIfNewIp(ipAdress, authorizeRetest);
-});
-
-//LAUNCH GAME
-setGameParameters();
-
-async function setGameParameters() {
-    if (window.mobileAndTabletCheck()) {
-        document.getElementById("mobileRestriction").style.display = '';
-        document.getElementById("explainGame").style.display = 'none';
-        return;
-    } else {
-        document.getElementById("mobileRestriction").style.display = 'none';
-    }
-    fetch('/gameParameters')
-        .then(response =>
-            response.json()
-        )
-        .then(data => {
-            const gameParameters = data[0];
-            console.log(gameParameters);
-            authorizeRetest = gameParameters.authorizeRetest;
-            testIfNewIp(ipAdress, authorizeRetest);
-            nbBlocksToDo = gameParameters.nbBlocksToDo;
-            nbFormsByBlock = gameParameters.nbFormsByBlock;
-            STEP = nbFormsByBlock * nbBlocksToDo;
-            formsFrequence = gameParameters.formsFrequence;
-            NB_LOCKS = gameParameters.nbLock;
-            formsList = gameParameters.formList;
-            NB_TARGET_TO_SELECT = gameParameters.nbTargetToSelect;
-            NB_SLIDES = gameParameters.nbSlidesToUnlock;
-            TIME_SLIDER = gameParameters.timeBeforeSliderDisappear;
-            displayTimeline = gameParameters.displayTimeline;
-            BETWEEN_ELEMENT_INDEX = gameParameters.betweenElementIndex;
-            //update blockFormFrequence
-            blockFormFrequence = {};
-            shuffle(formsList);
-            for (let i in formsFrequence) {
-                blockFormFrequence[formsList[i]] = formsFrequence[i];
-            }
-            //here to drawBoard with only selectable form
-            formsList = formsList.slice(0, formsFrequence.length);
-            console.log('blockFormFrequence is ' + JSON.stringify(blockFormFrequence));
-        })
-        .catch(err => {
-            console.log("erreur dans la mise en place des parametres");
-            console.log(err);
-        })
-        /*.then(() => {
-            Game();
-        })*/
-}
-
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * i)
-        const temp = array[i]
-        array[i] = array[j]
-        array[j] = temp
-    }
-}
-
-//useful for array sum
-const reducer = (accumulator, currentValue) => accumulator + currentValue;
-
-//--------------------------------------------------------------------------------
-//                  GAME variables to post in the database
-//--------------------------------------------------------------------------------
-var formNameTimeline = [];
-var listLockState = []; //unlock state link to the formTimeline
-var nbTotalClick = 0;
-var nbUsefulClick = 0;
-var nbLockOpened = 0;
-var listNbClick = [];
-var listNbUnusefulClick = [];
-var listDuration = [];
-var listTryUnlock = [];
-var listTimeToUnlock = [];
-var listNbFormToSelect = [];
-var listNbLockOpened = [];
-var listOccurence = [];
-var listSliderDisplaySpan = [];
-var jsonOccurence = { 'Square': 1, 'Circle': 1, 'Triangle': 1, 'Cross': 1 };
-var firstUnlockOccurence = { 'Square': -1, 'Circle': -1, 'Triangle': -1, 'Cross': -1 };
-var firstUnlockTrial = { 'Square': -1, 'Circle': -1, 'Triangle': -1, 'Cross': -1 };
-var lastUnlockOccurence = { 'Square': -1, 'Circle': -1, 'Triangle': -1, 'Cross': -1 };
-var lastUnlockTrial = { 'Square': -1, 'Circle': -1, 'Triangle': -1, 'Cross': -1 };
-
-
-
-
-function Game() {
-
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: {}
-    };
-
-    const bodytemp = document.body
-    bodytemp.addEventListener("mousedown", clickCount); //also
-
-    function clickCount( /* mouse event*/ event) {
-        nbTotalClick++;
-    }
-
-    async function endGamePOSTING() {
-        //timestamp for the total duration
-        const timestamp = Date.now();
-
-        options.body = JSON.stringify({
-            initDate: initDate,
-            ipUser: ipAdress,
-            nbTrials: STEP,
-            lockSettings: NB_LOCKS,
-            sliderTimeBeforeDisappear: TIME_SLIDER,
-            nbFormsByBlock: nbFormsByBlock,
-            formNameTimeline: formNameTimeline,
-            listTryUnlock: listTryUnlock,
-            listLockState: listLockState,
-            listTimeToUnlock: listTimeToUnlock,
-            listSliderDisplaySpan: listSliderDisplaySpan,
-            listNbFormToSelect: listNbFormToSelect,
-            blockFormFrequence: blockFormFrequence,
-            listNbClick: listNbClick,
-            listNbUnusefulClick: listNbUnusefulClick,
-            listNbLockOpened: listNbLockOpened, //new
-            firstUnlockOccurence: firstUnlockOccurence,
-            firstUnlockTrial: firstUnlockTrial,
-            lastUnlockOccurence: lastUnlockOccurence,
-            lastUnlockTrial: lastUnlockTrial,
-            listOccurence: listOccurence,
-            listDuration: listDuration,
-            totalDuration: timestamp - new Date(initDate).getTime(),
-            betweenElementIndex: BETWEEN_ELEMENT_INDEX
-        });
-        const response = await fetch('/api', options);
-        const data = await response.json();
-        console.log(data);
-    }
-    //listNbUsefulClick: listNbUsefulClick,
-
+function GameTuto2() {
     //------------------class------------------------------
     //probablement à transferer dans un autre fichier js quand on saura comment faire
 
@@ -507,15 +357,16 @@ function Game() {
     const TL_MARGIN = 20; //Timeline margin to write step
     const INDEX_SIZE = MIN_SQUARE_SIZE + 3;
     const TL_HEIGHT = MIN_SIZE + 2 * TL_MARGIN; //timeline height
-    const TL_WIDTH = MIN_SIZE * STEP; //timeline width
+    const TL_WIDTH = 2 * MIN_SIZE * STEP; //timeline width
 
     const COLOR_FONT = "darkgrey";
     const COLOR_INDEX = "darkgrey";
-    const COLOR_TIMELINEBOARD = "white";
+    const COLOR_TIMELINEBOARD = "whitesmoke";
 
-    var canvTimeline = document.getElementById("timelineCanvas");
+    var canvTimeline = document.getElementById("timelineCanvasTuto2");
     canvTimeline.height = TL_HEIGHT;
     canvTimeline.width = TL_WIDTH;
+    //canvTimeline.style.marginTop = "100 px;";
 
     var currentStep = 0;
 
@@ -537,7 +388,7 @@ function Game() {
             if (formToAdd[tempFormSelected] == 0) {
                 delete formToAdd[tempFormSelected];
             }
-            switch (tempFormSelected) {
+            switch ("Triangle") {
                 case "Square":
                     currentForm = new Square(getTimelineGridX(currentIndex), getTimelineGridY(), MIN_SQUARE_SIZE, MIN_SQUARE_SIZE, false, ctxTimeline);
                     break;
@@ -558,13 +409,8 @@ function Game() {
         }
     }
 
-
     var nameCurrentForm = formTimeline[0].constructor.name;
 
-    //iniate formNameTimeline values
-    for (i in formTimeline) {
-        formNameTimeline[i] = String(formTimeline[i].constructor.name);
-    }
 
     //-------------------------------- functions ---------------------------------
 
@@ -601,9 +447,9 @@ function Game() {
     //-------------------------------------------------------------------------------------
     //game parameters
     const FPS = 30; //frames per second
-    const HEIGHT = 510;
-    const WIDTH = 495;
-    const GRID_SIZE = 4; //number of rows(and columns)
+    const HEIGHT = 382;
+    const WIDTH = 371;
+    const GRID_SIZE = 3; //number of rows(and columns)
 
     const CELL = WIDTH / (GRID_SIZE + 2); //size of cells
     const STROKE = CELL / 12; //stroke width
@@ -628,10 +474,10 @@ function Game() {
     const COLOR_SELECT = "white";
 
     //set up game canvas 
-    var canv = document.getElementById("formsBoardCanvas");
+    var canv = document.getElementById("formsBoardCanvasTuto2");
     canv.height = HEIGHT;
     canv.width = WIDTH;
-    canv.style.top = String(TL_HEIGHT) + "px"; //set the top here because of canvasTiimeline changing size
+    canv.style.marginTop = String(TL_HEIGHT) + "px"; //set the top here because of canvasTiimeline changing size
     //document.body.appendChild(canv); //have to attach it to html (if created in js file)
     var canvBoundings = canv.getBoundingClientRect();
 
@@ -656,9 +502,9 @@ function Game() {
         drawForms(formsBoard);
         drawTimelineBoard();
         drawStep();
-        drawScore();
+        //drawScore();
         drawTarget();
-        drawLearning();
+        //drawLearning();
     }
 
     function drawBoard() {
@@ -727,8 +573,6 @@ function Game() {
                 }
             }
         }
-        listNbFormToSelect.push(nbFormToSelect);
-        listLockState[currentStep] = learningState[nameCurrentForm];
         return { formsBoard: formsBoard, nbFormToSelect: nbFormToSelect };
     }
 
@@ -771,13 +615,15 @@ function Game() {
                     if (!form.selectable) {
                         form.vibrate = true;
                     } else {
-                        form.selected = true; //create this attribute !
+                        form.selected = true;
                         nbCurrentFormSelected++;
-                        nbUsefulClick++;
-                        if (learningState[form.constructor.name] == NB_LOCKS) {
+                        document.getElementById("tuto2step1").style.color = "#4CAF50";
+                        document.getElementById("tuto2step2").style.color = "#4CAF50";
+                        if (learningState[form.constructor.name] == NB_LOCKS2) {
                             selectAllUnlockForm = form.constructor.name;
                         } else if (nbCurrentFormSelected >= nbFormToSelect) {
-                            document.getElementById("nextButton").disabled = false;
+                            document.getElementById("nextButtonTuto2").disabled = false;
+                            document.getElementById("tuto2step2").style.color = "#4CAF50";
                         }
                         break OUTER; //if one form is to highlight no need to look further
                     }
@@ -795,49 +641,33 @@ function Game() {
                 }
 
             }
-            document.getElementById("nextButton").disabled = false;
+            document.getElementById("nextButtonTuto2").disabled = false;
         }
     }
 
     function gameUpdate() {
         //update Game Variable to save :
-        listOccurence[currentStep] = jsonOccurence[nameCurrentForm];
-        jsonOccurence[nameCurrentForm]++;
-        listNbLockOpened[currentStep] = nbLockOpened;
-        listTryUnlock[currentStep] = unlockDone;
-        listTimeToUnlock[currentStep] = currentUnlockTime;
-        listNbClick.push(listNbClick.length > 0 ? nbTotalClick - listNbClick.reduce(reducer) : nbTotalClick)
-        listNbUnusefulClick.push(nbTotalClick - nbUsefulClick);
-        listSliderDisplaySpan[currentStep] = unlockDone == 1 ? sliderDisplaySpan : -1;
-        if (nbTotalClick > nbUsefulClick) {
-            nbUsefulClick = nbTotalClick;
-        }
-        var timestamp = Date.now();
-        //start is initialise in chrono variables
-        listDuration.push(timestamp - start); // new Date(timestamp - start)); 
-        //--------------------------------------------------
         //update Game
         start = new Date(); //useful for chrono
         formTimeline[currentStep].highlight = true;
         currentStep++;
-        currentScore += 10;
+        //currentScore += 10;
         unlockable = true; //to authorize to unlock again
         sliderable = true; //to authorize to slider again
         if (currentStep >= STEP) {
             console.log("END OF THE GAME");
-            endGamePOSTING(); //post infos of the game
-            document.getElementById("endGame").style.display = "flex";
-            document.getElementById("scoreValue").innerHTML = currentScore;
-            $.getScript('confetti.js', function() {
-                BeginConfetti();
-            });
+            document.getElementById("boardTuto2").style.display = 'none';
+            document.getElementById("buttonToTuto3").style.display = '';
+
+            document.getElementById("tuto2step4").style.color = "#4CAF50";
+
             return;
         }
         //set current parameters
         nameCurrentForm = formTimeline[currentStep].constructor.name;
         indexStep.x = getTimelineGridX(currentStep);
         currentTarget = createTarget(nameCurrentForm)
-        boardInfos = newGame(nameCurrentForm); //learningState[nameCurrentForm] == NB_LOCKS ? 'nothing to select' : nameCurrentForm);
+        boardInfos = newGame(nameCurrentForm); //learningState[nameCurrentForm] == NB_LOCKS2 ? 'nothing to select' : nameCurrentForm);
         formsBoard = boardInfos.formsBoard;
         nbFormToSelect = boardInfos.nbFormToSelect;
         nbCurrentFormSelected = 0;
@@ -845,41 +675,42 @@ function Game() {
         unlockDone = 0;
         currentUnlockTime = -1;
     }
-
-    //------------------------------------------------------------------------------
-    //                             scoreCanvas
-    //------------------------------------------------------------------------------
-    const SC_HEIGHT = 50;
+    /*
+        //------------------------------------------------------------------------------
+        //                             scoreCanvas
+        //------------------------------------------------------------------------------
+    */
+    const SC_HEIGHT = 0;
     const SC_WIDTH = 160;
-    const SCORE_COLOR_FONT = COLOR_BOARDER;
+    /*    const SCORE_COLOR_FONT = COLOR_BOARDER;
 
-    var scoreCanvas = document.getElementById("scoreCanvas");
-    scoreCanvas.height = SC_HEIGHT;
-    scoreCanvas.width = SC_WIDTH;
-    scoreCanvas.style.top = String(TL_HEIGHT) + "px";
-    scoreCanvas.style.left = String(WIDTH + STROKE) + "px";
+        var scoreCanvas = document.getElementById("scoreCanvas");
+        scoreCanvas.height = SC_HEIGHT;
+        scoreCanvas.width = SC_WIDTH;
+        //scoreCanvas.style.top = String(TL_HEIGHT) + "px";
+        scoreCanvas.style.left = String(WIDTH + STROKE) + "px";
 
-    //score value
-    var currentScore = 0;
+        //score value
+        var currentScore = 0;
 
-    //set up context
-    var ctxScore = scoreCanvas.getContext("2d");
-    ctxScore.lineWidth = STROKE;
+        //set up context
+        var ctxScore = scoreCanvas.getContext("2d");
+        ctxScore.lineWidth = STROKE;
 
-    //--------------------------------  function ---------------------------------
-    function drawScore() {
-        //draw Score Board
-        ctxScore.fillStyle = COLOR_BOARD;
-        ctxScore.strokeStyle = COLOR_BOARDER;
-        ctxScore.fillRect(0, 0, SC_WIDTH, SC_HEIGHT);
-        ctxScore.strokeRect(STROKE / 2, STROKE / 2, SC_WIDTH - STROKE, SC_HEIGHT - STROKE);
-        //draw the text
-        ctxScore.fillStyle = SCORE_COLOR_FONT;
-        ctxScore.font = "bold 18px arial";
-        ctxScore.textAlign = "center";
-        ctxScore.fillText("SCORE : " + currentScore, SC_WIDTH / 2, SC_HEIGHT / 2 + 7); //magic numbers ...
-    }
-
+        //--------------------------------  function ---------------------------------
+        function drawScore() {
+            //draw Score Board
+            ctxScore.fillStyle = COLOR_BOARD;
+            ctxScore.strokeStyle = COLOR_BOARDER;
+            ctxScore.fillRect(0, 0, SC_WIDTH, SC_HEIGHT);
+            ctxScore.strokeRect(STROKE / 2, STROKE / 2, SC_WIDTH - STROKE, SC_HEIGHT - STROKE);
+            //draw the text
+            ctxScore.fillStyle = SCORE_COLOR_FONT;
+            ctxScore.font = "bold 18px arial";
+            ctxScore.textAlign = "center";
+            ctxScore.fillText("SCORE : " + currentScore, SC_WIDTH / 2, SC_HEIGHT / 2 + 7); //magic numbers ...
+        }
+    */
     //------------------------------------------------------------------------------
     //                             targetCanvas
     //------------------------------------------------------------------------------
@@ -902,10 +733,10 @@ function Game() {
     const UNLOCK_BUTTON_COLOR_LIT = "gray";
     const UNLOCK_BUTTON_COLOR_STROKE = "darkgrey";
 
-    var targetCanvas = document.getElementById("targetCanvas");
+    var targetCanvas = document.getElementById("targetCanvasTuto2");
     targetCanvas.height = TC_HEIGHT;
     targetCanvas.width = TC_WIDTH;
-    targetCanvas.style.top = String(TL_HEIGHT + SC_HEIGHT + TC_TOP_MARGIN) + "px";
+    targetCanvas.style.marginTop = String(TL_HEIGHT + SC_HEIGHT + TC_TOP_MARGIN) + "px";
     targetCanvas.style.left = String(WIDTH + STROKE) + "px";
     var targetCanvasBoundings = targetCanvas.getBoundingClientRect();
     var targetSelectable = false; //authorize to clic on the target to unlock
@@ -945,7 +776,6 @@ function Game() {
     //--------------------------------  function ---------------------------------
     function highlightButton( /* type MouseEvent*/ event) {
         if (!unlockButton) return;
-        console.log('highlight alors que pas de button');
         //get mouse position relative to the canvas
         let x = event.offsetX;
         let y = event.offsetY;
@@ -971,8 +801,7 @@ function Game() {
         //get mouse position relative to the canvas
         let x = event.offsetX;
         let y = event.offsetY;
-        if (unlockButton.contains(x, y) && nbCurrentFormSelected >= nbFormToSelect && learningState[nameCurrentForm] != NB_LOCKS) {
-            nbUsefulClick++;
+        if (unlockButton.contains(x, y) && nbCurrentFormSelected >= nbFormToSelect && learningState[nameCurrentForm] != NB_LOCKS2) {
             unlockDone = 2;
             sliderDisplay();
             unlockButton = null;
@@ -990,11 +819,10 @@ function Game() {
         const slider = document.createElement('input');
         slider.id = 'slider';
         slider.type = 'range'
-        slider.style.top = String(TL_HEIGHT + SC_HEIGHT + 2 * TC_TOP_MARGIN + TC_HEIGHT) + "px";
+        slider.style.marginTop = String(TL_HEIGHT + SC_HEIGHT + 2 * TC_TOP_MARGIN + TC_HEIGHT) + "px";
         slider.style.left = String(WIDTH + STROKE) + "px";
         slider.style.position = 'absolute';
         slider.style.width = String(TC_WIDTH - STROKE) + "px";
-        slider.onclick = function() { nbUsefulClick++ };
         slider.onmouseover = function() { this.style.cursor = 'grab' };
         slider.onmousedown = function() {
             this.style.cursor = 'grabbing';
@@ -1061,19 +889,18 @@ function Game() {
             return
         }
         if (!unlockable) return;
-        if (learningState[nameCurrentForm] == NB_LOCKS) return;
+        if (learningState[nameCurrentForm] == NB_LOCKS2) return;
         if (firstUnlockOccurence[nameCurrentForm] < 0) firstUnlockOccurence[nameCurrentForm] = jsonOccurence[nameCurrentForm];
         if (firstUnlockTrial[nameCurrentForm] < 0) firstUnlockTrial[nameCurrentForm] = currentStep + 1; //+1 'cause current step start from 0
         lastUnlockOccurence[nameCurrentForm] = jsonOccurence[nameCurrentForm];
         lastUnlockTrial[nameCurrentForm] = currentStep + 1;
         //next if is to test if learning state can improve
-        if (learningState[nameCurrentForm] < NB_LOCKS) {
+        if (learningState[nameCurrentForm] < NB_LOCKS2) {
             learningState[nameCurrentForm] += 1;
             unlockable = false;
             unlockDone = 1; //for listTryUnlock
             var timestamp = Date.now();
             currentUnlockTime = (timestamp - start);
-            nbUsefulClick++;
             nbLockOpened++;
         }
         sliderDisplaySpan = Date.now() - sliderDisplaySpan;
@@ -1103,15 +930,17 @@ function Game() {
         ctxTarget.fillStyle = TARGET_COLOR_FONT;
         ctxTarget.font = "bold 24px arial";
         ctxTarget.textAlign = "center";
-        ctxTarget.fillText(timer, TC_WIDTH / 2, 33);
+        // ctxTarget.fillText(timer, TC_WIDTH / 2, 33);
         //draw unlock button
+        unlockButton = false;
         if (unlockButton) unlockButton.draw();
         //draw unlock text
         ctxTarget.fillStyle = TARGET_COLOR_FONT;
         ctxTarget.font = "bold 18px arial";
         ctxTarget.textAlign = "center";
         var text = "UNLOCK";
-        if (learningState[nameCurrentForm] == NB_LOCKS) text = "UNLOCKED";
+        //if (learningState[nameCurrentForm] == NB_LOCKS2) text = "UNLOCKED";
+        if (true) text = "UNLOCKED";
         else if (!unlockButton) text = '';
         ctxTarget.fillText(text, TC_WIDTH / 2, UNLOCK_Y + 5);
     }
@@ -1119,25 +948,25 @@ function Game() {
     function createTarget(currentTargetName) {
         //recreation du bouton si necessaire
         unlockButton = null;
-        if (!(learningState[nameCurrentForm] == NB_LOCKS)) {
+        if (!(learningState[nameCurrentForm] == NB_LOCKS2)) {
             unlockButton = new Button(UNLOCK_X, UNLOCK_Y, UNLOCK_W, UNLOCK_H, UNLOCK_RADIUS, ctxTarget);
         }
         //creation of the target form
         switch (currentTargetName) {
             case "Square":
-                targetSelectable = learningState["Square"] == NB_LOCKS ? true : false;
+                targetSelectable = learningState["Square"] == NB_LOCKS2 ? true : false;
                 currentTarget = new Square(TC_WIDTH / 2, TC_HEIGHT / 2, TC_SQUARE_SIZE, TC_SQUARE_SIZE, targetSelectable, ctxTarget);
                 break;
             case "Circle":
-                targetSelectable = learningState["Circle"] == NB_LOCKS ? true : false;
+                targetSelectable = learningState["Circle"] == NB_LOCKS2 ? true : false;
                 currentTarget = new Circle(TC_WIDTH / 2, TC_HEIGHT / 2, TC_CIRCLE_RADIUS, targetSelectable, ctxTarget);
                 break;
             case "Triangle":
-                targetSelectable = learningState["Triangle"] == NB_LOCKS ? true : false;
+                targetSelectable = learningState["Triangle"] == NB_LOCKS2 ? true : false;
                 currentTarget = new Triangle(TC_WIDTH / 2, TC_HEIGHT / 2, TC_TRIANGLE_HEIGHT, targetSelectable, ctxTarget);
                 break;
             case "Cross":
-                targetSelectable = learningState["Cross"] == NB_LOCKS ? true : false;
+                targetSelectable = learningState["Cross"] == NB_LOCKS2 ? true : false;
                 currentTarget = new Cross(TC_WIDTH / 2, TC_HEIGHT / 2, TC_SQUARE_SIZE, TC_SQUARE_SIZE, TC_CROSS_THICKNESS, targetSelectable, ctxTarget);
                 break;
             default:
@@ -1188,7 +1017,6 @@ function Game() {
         //look for forms to select
         if (currentTarget.contains(x, y) && currentTarget.selectable && !currentTarget.selected) {
             currentTarget.selected = true; //create this attribute !
-            nbUsefulClick++;
             for (let row of formsBoard) {
                 for (let form of row) {
                     if (form.constructor.name == nameCurrentForm && form.selectable && !form.selected) {
@@ -1198,21 +1026,24 @@ function Game() {
                 }
 
             }
-            document.getElementById("nextButton").disabled = false;
+            document.getElementById("nextButtonTuto2").disabled = false;
+            document.getElementById("tuto2step1").style.color = "#4CAF50";
+            document.getElementById("tuto2step2").style.color = "#4CAF50";
         }
     }
 
     //------------------------------------------------------------------------------
     //                             learningCanvas
     //------------------------------------------------------------------------------
+    /*
     const LC_CELL = 70;
-    //var NB_LOCKS = 3;
+    //var NB_LOCKS2 = 3;
     const IMG_WIDTH = 4 * LC_CELL / 12;
     const IMG_HEIGHT = 5 * LC_CELL / 12;
     const IMG_MARGIN = LC_CELL / 2;
     const LC_MARGIN = LC_CELL; //tester differentes valeurs
     const LC_HEIGHT = LC_CELL * (formsList.length + 1) + LC_MARGIN / 2; //LearningCanvas Height
-    const LC_WIDTH = 3 / 2 * LC_CELL + parseInt(NB_LOCKS) * (IMG_WIDTH + IMG_MARGIN / 3); //LearningCanvas Width
+    const LC_WIDTH = 3 / 2 * LC_CELL + parseInt(NB_LOCKS2) * (IMG_WIDTH + IMG_MARGIN / 3); //LearningCanvas Width
 
 
     const LC_CIRCLE_RADIUS = LC_CELL / 4;
@@ -1223,7 +1054,7 @@ function Game() {
     var learningCanvas = document.getElementById("learningCanvas");
     learningCanvas.height = LC_HEIGHT;
     learningCanvas.width = LC_WIDTH;
-    learningCanvas.style.top = String(TL_HEIGHT) + "px";
+    learningCanvas.style.marginTop = String(TL_HEIGHT) + "px";
     learningCanvas.style.left = String(WIDTH + STROKE + SC_WIDTH + STROKE) + "px";
 
     //load img
@@ -1283,8 +1114,8 @@ function Game() {
 
     function drawLocks() {
         for (let i = 0; i < formsList.length; i++) {
-            for (let j = 0; j < NB_LOCKS; j++) {
-                if (learningState[formsList[i]] > j || learningState[formsList[i]] == NB_LOCKS) {
+            for (let j = 0; j < NB_LOCKS2; j++) {
+                if (learningState[formsList[i]] > j || learningState[formsList[i]] == NB_LOCKS2) {
                     ctxLearning.drawImage(imgUnlock, getImgGridX(j), getImgGridY(i), IMG_WIDTH, IMG_HEIGHT);
                 } else {
                     ctxLearning.drawImage(imgLock, getImgGridX(j), getImgGridY(i), IMG_WIDTH, IMG_HEIGHT);
@@ -1292,25 +1123,25 @@ function Game() {
             }
         }
     }
-
+*/
     //------------------------------------------------------------------------------
     //                              Button
     //------------------------------------------------------------------------------
 
-    var nextButton = document.getElementById("nextButton");
+    var nextButton = document.getElementById("nextButtonTuto2");
     //find a better way to choose the position of the nextButton
     nextButton.style.display = '';
-    nextButton.style.top = String(TL_HEIGHT + HEIGHT - nextButton.height) + "px;";
-    nextButton.style.margin = String(WIDTH + STROKE) + "px";
+    //nextButton.style.marginTop = String(TL_HEIGHT + HEIGHT - nextButton.height) + "px;";
+    nextButton.style.marginLeft = String(WIDTH + STROKE) + "px";
+    nextButton.style.marginTop = String(WIDTH + STROKE) + "px";;
     nextButton.disabled = true;
 
-    //--------------------    function   -------------------------------------------
+    //--------------------    function   ------------------------------------------
     nextButton.onclick = function() {
 
         if (nbCurrentFormSelected >= nbFormToSelect) {
-            nbUsefulClick++;
             gameUpdate();
-            killSlider();
+            document.getElementById("tuto2step3").style.color = "#4CAF50";
         }
     }
 

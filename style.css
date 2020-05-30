@@ -69,7 +69,7 @@ button:disabled:hover {
     background-color: whitesmoke;
     padding: 50px;
     /*padding-top: 70px;*/
-    text-align: center;
+    /*text-align: center;*/
     position: absolute;
     top: 50px;
     left: 50%;
@@ -92,10 +92,13 @@ button:disabled:hover {
     color: white;
 }
 
+.infoDivButton {
+    text-align: right;
+}
 
-/*
-.infoButton{
-    
+
+/*.infoButton {
+    right: 0;
 }*/
 
 
