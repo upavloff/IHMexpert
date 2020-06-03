@@ -16,28 +16,29 @@
 
         <div class="blackBG"></div>
         <div id="explainGameBox" class="infoBox">
-            <div class="infoTitle">IHM Expert</div>
+            <div class="infoTitle">Experience</div>
             <pre>
-We do not always invest in improving our interaction strategies. 
-We tend to prefer familiar but suboptimal in- teractions, such as
-"point-and-click" in a menu, instead of learning new interactions, 
-such as shortcuts or gestural commands.
-            </pre>
+Congratulations! You successfully performed the tutorial. You can now perform the main experiment.
+</pre>
             <pre>
-Time discounting theories from economics would describe this tendency
-as our preference to favor an immediate reward (i.e. rapidly deliver 
-our task now), over a long term reward (i.e. to learn a new method in 
-order to improve this task at a future time).
-            </pre>
+Your objective is to finish the <span id="nTask">experience</span> <b>as fast as possible</b>.
+</pre>
             <pre>
-In this paper we transpose and test an economic time discounting model
-to a human-computer interaction context. Our model attempts to understand
-how the choice of users to transition from novice to expert behavior 
-evolves over time.
+Each task consists of selecting all symbols of the target shape <span id="shapeList"></span>.
+- You can use the Novice method (left panel) 
+    * Optionally, you can unlock one locker (right panel) to make the expert method available
+- Or you can use the expert method once all the lockers have been unlocked.
+</pre>
+            <pre>
+Note: All shapes do not have the same frequencies. Some shapes will appear more frequently than the other.
+</pre>
+            <pre>
+As soon as you are ready, you can click on the button start
             </pre>
 
-
-            <button class="infoButton" onclick="Game();document.getElementById('explainGame').style.display='none';">START GAME</button>
+            <div class="infoDivButton">
+                <button class="infoButton" onclick="Game();document.getElementById('explainGame').style.display='none';">START</button>
+            </div>
         </div>
     </div>
 
@@ -80,7 +81,9 @@ can not do the experience more than once
     <div id="endGame" class="blackBG" style="display: none;">
         <div id="endGameBox" class="infoBox">
             <div class="infoTitle">SCORE : <span id="scoreValue"></span></div>
-            <button onclick="window.location.reload();">PLAY AGAIN <i class="fa fa-repeat"></i></button>
+            <pre>
+Thank you for your participation.
+            </pre>
         </div>
     </div>
 

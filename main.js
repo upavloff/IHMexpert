@@ -66,6 +66,7 @@ async function setGameParameters() {
             //here to drawBoard with only selectable form
             formsList = formsList.slice(0, formsFrequence.length);
             console.log('blockFormFrequence is ' + JSON.stringify(blockFormFrequence));
+            updateIntroMsg(STEP, formsList);
         })
         .catch(err => {
             console.log("erreur dans la mise en place des parametres");
@@ -75,6 +76,12 @@ async function setGameParameters() {
             Game();
         })*/
 }
+
+function updateIntroMsg(nTask, formsList) {
+    document.getElementById("nTask").innerHTML = nTask + " tasks";
+    document.getElementById("shapeList").innerHTML = "(" + formsList + ")";
+}
+
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -911,9 +918,6 @@ function Game() {
     var targetSelectable = false; //authorize to clic on the target to unlock
     //chrono variables
     var start = new Date(); //begin the timer
-    var end = 0;
-    var diff = 0;
-    var timer = "00:00";
 
     //set up context
     var ctxTarget = targetCanvas.getContext("2d");
@@ -1098,12 +1102,6 @@ function Game() {
         ctxTarget.strokeRect(STROKE / 2, STROKE / 2, TC_WIDTH - STROKE, TC_HEIGHT - STROKE);
         //draw the target
         currentTarget.draw();
-        //draw chronometer
-        chronometer();
-        ctxTarget.fillStyle = TARGET_COLOR_FONT;
-        ctxTarget.font = "bold 24px arial";
-        ctxTarget.textAlign = "center";
-        ctxTarget.fillText(timer, TC_WIDTH / 2, 33);
         //draw unlock button
         if (unlockButton) unlockButton.draw();
         //draw unlock text
@@ -1147,21 +1145,6 @@ function Game() {
         return currentTarget;
     }
 
-    function chronometer() {
-        end = new Date();
-        diff = end - start;
-        diff = new Date(diff);
-        var sec = diff.getSeconds();
-        var min = diff.getMinutes();
-        if (min < 10) {
-            min = "0" + min;
-        }
-        if (sec < 10) {
-            sec = "0" + sec;
-        }
-        timer = min + ":" + sec;
-        return timer;
-    }
 
     function highlightTarget( /* type MouseEvent*/ event) {
         //highlights forms inside the forms board canvas
