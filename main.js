@@ -826,14 +826,14 @@ function Game() {
         start = new Date(); //useful for chrono
         formTimeline[currentStep].highlight = true;
         currentStep++;
-        currentScore += 10;
+        //currentScore += 10;
         unlockable = true; //to authorize to unlock again
         sliderable = true; //to authorize to slider again
         if (currentStep >= STEP) {
             console.log("END OF THE GAME");
             endGamePOSTING(); //post infos of the game
             document.getElementById("endGame").style.display = "flex";
-            document.getElementById("scoreValue").innerHTML = currentScore;
+            //document.getElementById("scoreValue").innerHTML = currentScore;
             $.getScript('confetti.js', function() {
                 BeginConfetti();
             });
@@ -948,7 +948,6 @@ function Game() {
     //--------------------------------  function ---------------------------------
     function highlightButton( /* type MouseEvent*/ event) {
         if (!unlockButton) return;
-        console.log('highlight alors que pas de button');
         //get mouse position relative to the canvas
         let x = event.offsetX;
         let y = event.offsetY;
