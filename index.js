@@ -2,6 +2,7 @@ const express = require('express');
 const Datastore = require('nedb');
 require('dotenv').config;
 const cors = require('cors');
+const nodemailer = require("nodemailer");
 const app = express();
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`listening at ${port}...`));
@@ -117,7 +118,39 @@ app.get('/password' /*getData*/ , (request, response) => {
     });
 });
 
+//prepare mail :
+let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+        user: "ihmexpert2020@gmail.com",
+        pass: "Gilles2020",
+    },
+});
 
+app.post('/mail', (request, response) => {
+    console.log('I got a request to send mail');
+    const mail = request.body;
+
+    // send mail with defined transport object
+    //let info = await 
+    transporter.sendMail({
+        from: '"IHM expert" <ihmexpert2020@gmail.com>', // sender address
+        to: "gilles.bailly@sorbonne-universite.fr", // list of receivers
+        subject: "Comment", // Subject line
+        //text: "Hello world?", // plain text body
+        html: mail.content, // html body
+    });
+
+    //console.log("Message sent: %s", info.messageId);
+
+    /* repondre au post */
+    response.json({
+        status: 'success',
+        message: 'sent',
+    });
+});
 
 function argMin(array) {
     return [].map.call(array, (x, i) => [x, i]).reduce((r, a) => (a[0] < r[0] ? a : r))[1];

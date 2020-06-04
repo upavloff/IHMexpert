@@ -84,6 +84,13 @@ can not do the experience more than once
             <pre>
 Thank you for your participation.
             </pre>
+            <div id="commentSection">
+                <textarea name="comment" id="experienceComment" cols="50" rows="10" placeholder="Write your comments here."></textarea><br>
+
+                <div class="infoDivButton">
+                    <button class="infoButton" onclick="sendEmail();document.getElementById('commentSection').style.display='none'" ;>Submit</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -91,6 +98,25 @@ Thank you for your participation.
     <script src="verification.js"></script>
     <script src="main.js"></script>
     <script src="confetti.js"></script>
+
+    <script>
+        function sendEmail() {
+            const content = document.getElementById("experienceComment").value.replace(/\n\r?/g, '<br />');
+            if (content == '') return;
+            const mail = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: {}
+            };
+            mail.body = JSON.stringify({
+                content: content
+            });
+            fetch('/mail', mail);
+            console.log('mail sent');
+        }
+    </script>
 
 </body>
 
