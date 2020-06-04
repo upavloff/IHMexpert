@@ -49,7 +49,7 @@ async function setGameParameters() {
             nbBlocksToDo = gameParameters.nbBlocksToDo;
             nbFormsByBlock = gameParameters.nbFormsByBlock;
             STEP = nbFormsByBlock * nbBlocksToDo;
-            formsFrequence = gameParameters.formsFrequence;
+            var formsFrequence = gameParameters.formsFrequence;
             NB_LOCKS = gameParameters.nbLock;
             formsList = gameParameters.formList;
             NB_TARGET_TO_SELECT = gameParameters.nbTargetToSelect;
@@ -640,7 +640,6 @@ function Game() {
     canv.width = WIDTH;
     canv.style.top = String(TL_HEIGHT) + "px"; //set the top here because of canvasTiimeline changing size
     //document.body.appendChild(canv); //have to attach it to html (if created in js file)
-    var canvBoundings = canv.getBoundingClientRect();
 
     //set up context
     var ctxFormsBoard = canv.getContext("2d");
@@ -663,7 +662,7 @@ function Game() {
         drawForms(formsBoard);
         drawTimelineBoard();
         drawStep();
-        drawScore();
+        //drawScore();
         drawTarget();
         drawLearning();
     }
@@ -858,35 +857,36 @@ function Game() {
     //------------------------------------------------------------------------------
     const SC_HEIGHT = 50;
     const SC_WIDTH = 160;
-    const SCORE_COLOR_FONT = COLOR_BOARDER;
+    /*
+        const SCORE_COLOR_FONT = COLOR_BOARDER;
 
-    var scoreCanvas = document.getElementById("scoreCanvas");
-    scoreCanvas.height = SC_HEIGHT;
-    scoreCanvas.width = SC_WIDTH;
-    scoreCanvas.style.top = String(TL_HEIGHT) + "px";
-    scoreCanvas.style.left = String(WIDTH + STROKE) + "px";
+        var scoreCanvas = document.getElementById("scoreCanvas");
+        scoreCanvas.height = SC_HEIGHT;
+        scoreCanvas.width = SC_WIDTH;
+        scoreCanvas.style.top = String(TL_HEIGHT) + "px";
+        scoreCanvas.style.left = String(WIDTH + STROKE) + "px";
 
-    //score value
-    var currentScore = 0;
+        //score value
+        var currentScore = 0;
 
-    //set up context
-    var ctxScore = scoreCanvas.getContext("2d");
-    ctxScore.lineWidth = STROKE;
+        //set up context
+        var ctxScore = scoreCanvas.getContext("2d");
+        ctxScore.lineWidth = STROKE;
 
-    //--------------------------------  function ---------------------------------
-    function drawScore() {
-        //draw Score Board
-        ctxScore.fillStyle = COLOR_BOARD;
-        ctxScore.strokeStyle = COLOR_BOARDER;
-        ctxScore.fillRect(0, 0, SC_WIDTH, SC_HEIGHT);
-        ctxScore.strokeRect(STROKE / 2, STROKE / 2, SC_WIDTH - STROKE, SC_HEIGHT - STROKE);
-        //draw the text
-        ctxScore.fillStyle = SCORE_COLOR_FONT;
-        ctxScore.font = "bold 18px arial";
-        ctxScore.textAlign = "center";
-        ctxScore.fillText("SCORE : " + currentScore, SC_WIDTH / 2, SC_HEIGHT / 2 + 7); //magic numbers ...
-    }
-
+        //--------------------------------  function ---------------------------------
+        function drawScore() {
+            //draw Score Board
+            ctxScore.fillStyle = COLOR_BOARD;
+            ctxScore.strokeStyle = COLOR_BOARDER;
+            ctxScore.fillRect(0, 0, SC_WIDTH, SC_HEIGHT);
+            ctxScore.strokeRect(STROKE / 2, STROKE / 2, SC_WIDTH - STROKE, SC_HEIGHT - STROKE);
+            //draw the text
+            ctxScore.fillStyle = SCORE_COLOR_FONT;
+            ctxScore.font = "bold 18px arial";
+            ctxScore.textAlign = "center";
+            ctxScore.fillText("SCORE : " + currentScore, SC_WIDTH / 2, SC_HEIGHT / 2 + 7); //magic numbers ...
+        }
+        */
     //------------------------------------------------------------------------------
     //                             targetCanvas
     //------------------------------------------------------------------------------
@@ -912,9 +912,8 @@ function Game() {
     var targetCanvas = document.getElementById("targetCanvas");
     targetCanvas.height = TC_HEIGHT;
     targetCanvas.width = TC_WIDTH;
-    targetCanvas.style.top = String(TL_HEIGHT + SC_HEIGHT + TC_TOP_MARGIN) + "px";
+    targetCanvas.style.top = String(TL_HEIGHT + /*SC_HEIGHT +*/ TC_TOP_MARGIN) + "px";
     targetCanvas.style.left = String(WIDTH + STROKE) + "px";
-    var targetCanvasBoundings = targetCanvas.getBoundingClientRect();
     var targetSelectable = false; //authorize to clic on the target to unlock
     //chrono variables
     var start = new Date(); //begin the timer
