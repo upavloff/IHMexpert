@@ -588,7 +588,7 @@ function Game() {
     function drawStep() {
         ctxTimeline.fillStyle = COLOR_FONT;
         ctxTimeline.font = "bold 18px arial";
-        ctxTimeline.fillText("Step " + (currentStep + 1) + "/" + STEP, 2, 23);
+        ctxTimeline.fillText("Step " + Math.min(currentStep + 1, STEP) + "/" + STEP, 2, 23);
         if (displayTimeline) {
             for (let form of formTimeline) {
                 form.draw();
@@ -900,6 +900,7 @@ function Game() {
     const TC_TRIANGLE_HEIGHT = TC_CELL / 2;
     const TC_CROSS_THICKNESS = TC_CELL / 8;
     const TARGET_COLOR_FONT = "red";
+    const TARGET_COLOR_FONT_UNLOCKED = "#4CAF50";
     const UNLOCK_X = TC_WIDTH / 2;
     const UNLOCK_Y = TC_HEIGHT - 30;
     const UNLOCK_W = 2 / 3 * TC_WIDTH;
@@ -1107,8 +1108,10 @@ function Game() {
         ctxTarget.font = "bold 18px arial";
         ctxTarget.textAlign = "center";
         var text = "UNLOCK";
-        if (learningState[nameCurrentForm] == NB_LOCKS) text = "UNLOCKED";
-        else if (!unlockButton) text = '';
+        if (learningState[nameCurrentForm] == NB_LOCKS) {
+            ctxTarget.fillStyle = TARGET_COLOR_FONT_UNLOCKED;
+            text = "UNLOCKED";
+        } else if (!unlockButton) text = '';
         ctxTarget.fillText(text, TC_WIDTH / 2, UNLOCK_Y + 5);
     }
 
